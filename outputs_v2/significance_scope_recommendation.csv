@@ -1,0 +1,11 @@
+Entity,Revenue,Assets,Country,Risk_Level,Asset_Percentage,Recommended_Scope
+USA_Sub,5000000000,7000000000,USA,Low,44.642857142857146,Full Scope
+Germany_Sub,3000000000,4000000000,Germany,Low,25.510204081632654,Full Scope
+Japan_Sub,900000000,1200000000,Japan,Low,7.653061224489796,Analytical Procedures
+Brazil_Sub,300000000,500000000,Brazil,High,3.188775510204082,Specific Procedures
+India_Sub,450000000,600000000,India,High,3.826530612244898,Specific Procedures
+France_Sub,700000000,950000000,France,Medium,6.058673469387755,Analytical Procedures
+Australia_Sub,500000000,750000000,Australia,Low,4.783163265306122,Analytical Procedures
+Mexico_Sub,150000000,200000000,Mexico,Medium,1.2755102040816326,Analytical Procedures
+Canada_Sub,250000000,300000000,Canada,Low,1.913265306122449,Analytical Procedures
+SouthAfrica_Sub,120000000,180000000,South Africa,High,1.1479591836734695,Specific Procedures

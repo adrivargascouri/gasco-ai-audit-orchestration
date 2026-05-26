@@ -1,0 +1,12 @@
+feature,importance
+risk_level_encoded,0.2096497465613124
+liquidity_ratio,0.1880909201330562
+manual_risk_flag_encoded,0.14619951209587295
+assets_percentage,0.14162350144231475
+assets,0.07861963307593073
+revenue_percentage,0.056188851995726506
+growth_rate,0.049337397542946235
+revenue,0.0433361411738782
+prior_findings_count,0.041825711974936286
+severe_findings_count,0.03243048134549919
+country_risk_score,0.01269810265852664

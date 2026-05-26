@@ -1,0 +1,11 @@
+Entity,Country,Assets,Risk_Level,Asset_Percentage,Recommended_Scope,Prediction_Confidence
+USA_Sub,USA,7000000000,Low,44.6429,Specific Procedures,0.5133
+Germany_Sub,Germany,4000000000,Low,25.5102,Specific Procedures,0.5767
+Japan_Sub,Japan,1200000000,Low,7.6531,Analytical Procedures,0.9367
+Brazil_Sub,Brazil,500000000,High,3.1888,Specific Procedures,0.6167
+India_Sub,India,600000000,High,3.8265,Specific Procedures,0.6833
+France_Sub,France,950000000,Medium,6.0587,Specific Procedures,0.7567
+Australia_Sub,Australia,750000000,Low,4.7832,Analytical Procedures,0.9867
+Mexico_Sub,Mexico,200000000,Medium,1.2755,Specific Procedures,0.5367
+Canada_Sub,Canada,300000000,Low,1.9133,Analytical Procedures,1.0
+SouthAfrica_Sub,South Africa,180000000,High,1.148,Specific Procedures,0.5733

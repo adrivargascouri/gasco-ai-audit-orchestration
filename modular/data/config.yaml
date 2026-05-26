@@ -1,0 +1,26 @@
+# Scope classification rules
+scope_rules:
+  asset_percentage_threshold: 0.05
+  high_risk_scope: "Specific Procedures"
+  default_scope: "Analytical Procedures"
+  full_scope_label: "Full Scope"
+
+# Coverage calculation rules
+coverage:
+  minimum_coverage_percentage: 70.0
+  included_scopes:
+    - "Full Scope"
+    - "Specific Procedures"
+
+# Audit instruction templates
+audit:
+  full_scope_template: "For {entity} in {country}, perform full scope audit procedures. The component should be audited comprehensively, including financial statements, key balances, revenue, expenses, assets, liabilities, and internal controls."
+  specific_procedures_template: "For {entity} in {country}, perform specific audit procedures focused on high-risk areas. Pay special attention to significant account balances, unusual transactions, management estimates, and areas with increased risk."
+  analytical_procedures_template: "For {entity} in {country}, perform analytical procedures only. Review financial trends, compare current results with prior periods, and investigate any unusual fluctuations."
+
+# Data paths
+group_data_path: "data/group_structure.json"
+findings_data_path: "data/findings_repo.csv"
+
+# Output paths
+output_directory: "outputs"

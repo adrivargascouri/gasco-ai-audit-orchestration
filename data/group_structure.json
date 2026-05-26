@@ -1,0 +1,72 @@
+[
+  {
+    "Entity": "USA_Sub",
+    "Revenue": 5000000000,
+    "Assets": 7000000000,
+    "Country": "USA",
+    "Risk_Level": "Low"
+  },
+  {
+    "Entity": "Germany_Sub",
+    "Revenue": 3000000000,
+    "Assets": 4000000000,
+    "Country": "Germany",
+    "Risk_Level": "Low"
+  },
+  {
+    "Entity": "Japan_Sub",
+    "Revenue": 900000000,
+    "Assets": 1200000000,
+    "Country": "Japan",
+    "Risk_Level": "Low"
+  },
+  {
+    "Entity": "Brazil_Sub",
+    "Revenue": 300000000,
+    "Assets": 500000000,
+    "Country": "Brazil",
+    "Risk_Level": "High"
+  },
+  {
+    "Entity": "India_Sub",
+    "Revenue": 450000000,
+    "Assets": 600000000,
+    "Country": "India",
+    "Risk_Level": "High"
+  },
+  {
+    "Entity": "France_Sub",
+    "Revenue": 700000000,
+    "Assets": 950000000,
+    "Country": "France",
+    "Risk_Level": "Medium"
+  },
+  {
+    "Entity": "Australia_Sub",
+    "Revenue": 500000000,
+    "Assets": 750000000,
+    "Country": "Australia",
+    "Risk_Level": "Low"
+  },
+  {
+    "Entity": "Mexico_Sub",
+    "Revenue": 150000000,
+    "Assets": 200000000,
+    "Country": "Mexico",
+    "Risk_Level": "Medium"
+  },
+  {
+    "Entity": "Canada_Sub",
+    "Revenue": 250000000,
+    "Assets": 300000000,
+    "Country": "Canada",
+    "Risk_Level": "Low"
+  },
+  {
+    "Entity": "SouthAfrica_Sub",
+    "Revenue": 120000000,
+    "Assets": 180000000,
+    "Country": "South Africa",
+    "Risk_Level": "High"
+  }
+]

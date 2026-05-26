@@ -1,0 +1,81 @@
+Entity,Country,Assets,Risk_Level,Asset_Percentage,Recommended_Scope,Prediction_Confidence,Explanation
+USA_Sub,USA,7000000000,Low,44.6429,Specific Procedures,0.5133,"USA_Sub was predicted as Specific Procedures with 51.33% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- low liquidity_ratio (1.31), consistent with higher audit attention (0.188)
+- manual risk flag enabled; this is a high-importance model signal (0.146)
+- high assets_percentage (44.64%), above the training upper quartile (13.20%)
+- large model-scale assets (53,334,438), above the training upper quartile
+Class probabilities: Analytical Procedures 11.33%, Specific Procedures 51.33%, Full Scope 37.33%."
+Germany_Sub,Germany,4000000000,Low,25.5102,Specific Procedures,0.5767,"Germany_Sub was predicted as Specific Procedures with 57.67% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- low liquidity_ratio (1.22), consistent with higher audit attention (0.188)
+- manual risk flag enabled; this is a high-importance model signal (0.146)
+- high assets_percentage (25.51%), above the training upper quartile (13.20%)
+- large model-scale assets (30,476,788), above the training upper quartile
+Class probabilities: Analytical Procedures 11.33%, Specific Procedures 57.67%, Full Scope 31.00%."
+Japan_Sub,Japan,1200000000,Low,7.6531,Analytical Procedures,0.9367,"Japan_Sub was predicted as Analytical Procedures with 93.67% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- strong liquidity_ratio (1.95), consistent with lower audit attention (0.188)
+- manual risk flag not enabled; this is a high-importance model signal (0.146)
+- mid-range assets_percentage (7.65%)
+- model-scale assets (9,143,084)
+Class probabilities: Analytical Procedures 93.67%, Specific Procedures 6.00%, Full Scope 0.33%."
+Brazil_Sub,Brazil,500000000,High,3.1888,Specific Procedures,0.6167,"Brazil_Sub was predicted as Specific Procedures with 61.67% confidence.
+The model likely weighted these signals most heavily:
+- high risk level; risk_level_encoded is a top model feature (0.210)
+- moderate liquidity_ratio (1.60) (0.188)
+- manual risk flag enabled; this is a high-importance model signal (0.146)
+- low assets_percentage (3.19%), below the training lower quartile (5.90%)
+- model-scale assets (3,809,628)
+Class probabilities: Analytical Procedures 29.67%, Specific Procedures 61.67%, Full Scope 8.67%."
+India_Sub,India,600000000,High,3.8265,Specific Procedures,0.6833,"India_Sub was predicted as Specific Procedures with 68.33% confidence.
+The model likely weighted these signals most heavily:
+- high risk level; risk_level_encoded is a top model feature (0.210)
+- moderate liquidity_ratio (1.81) (0.188)
+- manual risk flag enabled; this is a high-importance model signal (0.146)
+- low assets_percentage (3.83%), below the training lower quartile (5.90%)
+- model-scale assets (4,571,482)
+Class probabilities: Analytical Procedures 27.67%, Specific Procedures 68.33%, Full Scope 4.00%."
+France_Sub,France,950000000,Medium,6.0587,Specific Procedures,0.7567,"France_Sub was predicted as Specific Procedures with 75.67% confidence.
+The model likely weighted these signals most heavily:
+- medium risk level; risk_level_encoded is a top model feature (0.210)
+- moderate liquidity_ratio (1.73) (0.188)
+- manual risk flag not enabled; this is a high-importance model signal (0.146)
+- mid-range assets_percentage (6.06%)
+- model-scale assets (7,238,270)
+Class probabilities: Analytical Procedures 24.33%, Specific Procedures 75.67%, Full Scope 0.00%."
+Australia_Sub,Australia,750000000,Low,4.7832,Analytical Procedures,0.9867,"Australia_Sub was predicted as Analytical Procedures with 98.67% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- strong liquidity_ratio (2.01), consistent with lower audit attention (0.188)
+- manual risk flag not enabled; this is a high-importance model signal (0.146)
+- low assets_percentage (4.78%), below the training lower quartile (5.90%)
+- model-scale assets (5,714,442)
+Class probabilities: Analytical Procedures 98.67%, Specific Procedures 1.33%, Full Scope 0.00%."
+Mexico_Sub,Mexico,200000000,Medium,1.2755,Specific Procedures,0.5367,"Mexico_Sub was predicted as Specific Procedures with 53.67% confidence.
+The model likely weighted these signals most heavily:
+- medium risk level; risk_level_encoded is a top model feature (0.210)
+- moderate liquidity_ratio (1.75) (0.188)
+- manual risk flag not enabled; this is a high-importance model signal (0.146)
+- low assets_percentage (1.28%), below the training lower quartile (5.90%)
+- model-scale assets (1,523,827)
+Class probabilities: Analytical Procedures 46.33%, Specific Procedures 53.67%, Full Scope 0.00%."
+Canada_Sub,Canada,300000000,Low,1.9133,Analytical Procedures,1.0,"Canada_Sub was predicted as Analytical Procedures with 100.00% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- strong liquidity_ratio (2.08), consistent with lower audit attention (0.188)
+- manual risk flag not enabled; this is a high-importance model signal (0.146)
+- low assets_percentage (1.91%), below the training lower quartile (5.90%)
+- model-scale assets (2,285,801)
+Class probabilities: Analytical Procedures 100.00%, Specific Procedures 0.00%, Full Scope 0.00%."
+SouthAfrica_Sub,South Africa,180000000,High,1.148,Specific Procedures,0.5733,"SouthAfrica_Sub was predicted as Specific Procedures with 57.33% confidence.
+The model likely weighted these signals most heavily:
+- high risk level; risk_level_encoded is a top model feature (0.210)
+- moderate liquidity_ratio (1.60) (0.188)
+- manual risk flag enabled; this is a high-importance model signal (0.146)
+- low assets_percentage (1.15%), below the training lower quartile (5.90%)
+- model-scale assets (1,371,504)
+Class probabilities: Analytical Procedures 34.67%, Specific Procedures 57.33%, Full Scope 8.00%."

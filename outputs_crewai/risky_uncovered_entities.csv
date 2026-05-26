@@ -1,0 +1,9 @@
+Entity,Country,Assets,Risk_Level,Asset_Percentage,Recommended_Scope,Prediction_Confidence,Explanation
+Japan_Sub,Japan,1200000000,Low,7.6531,Analytical Procedures,0.9367,"Japan_Sub was predicted as Analytical Procedures with 93.67% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- strong liquidity_ratio (1.95), consistent with lower audit attention (0.188)
+- manual risk flag not enabled; this is a high-importance model signal (0.146)
+- mid-range assets_percentage (7.65%)
+- model-scale assets (9,143,084)
+Class probabilities: Analytical Procedures 93.67%, Specific Procedures 6.00%, Full Scope 0.33%."
