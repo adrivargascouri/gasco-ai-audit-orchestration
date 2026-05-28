@@ -43,7 +43,10 @@ def main() -> None:
         "Assets",
         "Risk_Level",
         "Asset_Percentage",
-        "Recommended_Scope",
+        "Original_ML_Scope",
+        "Guardrail_Adjusted_Scope",
+        "Guardrail_Action",
+        "Requires_Human_Review",
         "Prediction_Confidence",
     ]].to_string(index=False))
 
@@ -58,8 +61,10 @@ def main() -> None:
     print("\n5. SAMPLE AUDIT INSTRUCTIONS")
     print(instruction_result.instruction_df[[
         "Entity",
-        "Recommended_Scope",
+        "Original_ML_Scope",
+        "Guardrail_Adjusted_Scope",
         "Prediction_Confidence",
+        "Requires_Human_Review",
         "ML_Explanation_Summary",
     ]].head(5).to_string(index=False))
 

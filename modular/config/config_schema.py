@@ -70,12 +70,48 @@ class AuditConfig(BaseModel):
     )
 
 
+class BDOGuardrailsConfig(BaseModel):
+    """Configuration for BDO-style methodology guardrails."""
+
+    significant_component_threshold: float = Field(
+        default=15.0,
+        description="Asset percentage threshold for significant component guardrails",
+        ge=0.0,
+        le=100.0,
+    )
+    minimum_coverage_percentage: float = Field(
+        default=70.0,
+        description="Minimum adjusted group audit coverage percentage",
+        ge=0.0,
+        le=100.0,
+    )
+    confidence_threshold: float = Field(
+        default=0.65,
+        description="Minimum ML confidence before human review is required",
+        ge=0.0,
+        le=1.0,
+    )
+    high_risk_levels: list[str] = Field(
+        default=["High", "Critical"],
+        description="Risk levels requiring at least specific procedures",
+    )
+    scope_order: dict[str, int] = Field(
+        default={
+            "Analytical Procedures": 1,
+            "Specific Procedures": 2,
+            "Full Scope": 3,
+        },
+        description="Relative order of scope intensity",
+    )
+
+
 class AppConfig(BaseModel):
     """Root application configuration."""
 
     scope_rules: ScopeRulesConfig = Field(default_factory=ScopeRulesConfig)
     coverage: CoverageConfig = Field(default_factory=CoverageConfig)
     audit: AuditConfig = Field(default_factory=AuditConfig)
+    bdo_guardrails: BDOGuardrailsConfig = Field(default_factory=BDOGuardrailsConfig)
 
     # Data paths
     group_data_path: str = Field(

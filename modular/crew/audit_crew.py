@@ -20,6 +20,10 @@ from crewai.llms.base_llm import BaseLLM
 from modular.agents.coverage_agent import CoverageAgent, CoverageResult
 from modular.agents.instruction_agent import InstructionAgent, InstructionResult
 from modular.agents.risk_prediction_agent import RiskPredictionAgent, RiskPredictionResult
+from modular.bdo.component_instruction_pack import ComponentInstructionPack
+from modular.bdo.documentation_memo import BDODocumentationMemo
+from modular.bdo.guardrails import BDOGuardrails, GuardrailCoverageStatus
+from modular.bdo.methodology_mapper import BDOMethodologyMapper
 from modular.config.config_schema import AppConfig
 from modular.data.loader import DataLoader
 from modular.export.csv_exporter import CSVExporter
@@ -71,6 +75,10 @@ class GASCOAuditCrew:
         self.csv_exporter = CSVExporter(self.output_directory)
         self.prediction_tool = MLScopePredictionTool()
         self.risk_prediction_agent = RiskPredictionAgent(self.prediction_tool)
+        self.bdo_guardrails = BDOGuardrails(config.bdo_guardrails)
+        self.bdo_methodology_mapper = BDOMethodologyMapper()
+        self.bdo_documentation_memo = BDODocumentationMemo()
+        self.component_instruction_pack = ComponentInstructionPack()
         self.coverage_agent = CoverageAgent(config.coverage)
         self.instruction_agent = InstructionAgent(config.audit)
         self.explainability = ScopeModelExplainability()
@@ -78,6 +86,7 @@ class GASCOAuditCrew:
         self.group_df: pd.DataFrame | None = None
         self.findings_df: pd.DataFrame | None = None
         self.risk_result: RiskPredictionResult | None = None
+        self.guardrail_coverage_status: GuardrailCoverageStatus | None = None
         self.coverage_result: CoverageResult | None = None
         self.instruction_result: InstructionResult | None = None
         self.crew_output: Any = None
@@ -169,6 +178,12 @@ class GASCOAuditCrew:
         if self.group_df is None:
             raise RuntimeError("Group data must be loaded before risk prediction")
         self.risk_result = self.risk_prediction_agent.analyze_entities(self.group_df)
+        guarded_df, guardrail_coverage_status = self.bdo_guardrails.apply(
+            self.risk_result.scoped_df,
+            self.risk_result.feature_df,
+        )
+        self.guardrail_coverage_status = guardrail_coverage_status
+        self.risk_result.scoped_df = self.bdo_methodology_mapper.map_outputs(guarded_df)
 
     def _run_coverage_stage(self, _task_output: Any) -> None:
         if self.risk_result is None:
@@ -209,6 +224,8 @@ class GASCOAuditCrew:
             ),
             "prediction_explanations": self.output_directory / "prediction_explanations.txt",
             "workflow_summary": self.output_directory / "crew_workflow_summary.txt",
+            "bdo_documentation_memo": self.output_directory / "bdo_documentation_memo.txt",
+            "component_instruction_pack": self.output_directory / "component_auditor_instruction_pack.csv",
         }
 
         self.coverage_result.risky_uncovered_df.to_csv(
@@ -217,6 +234,15 @@ class GASCOAuditCrew:
         )
         self._write_prediction_explanations(export_paths["prediction_explanations"])
         self._write_workflow_summary(export_paths["workflow_summary"])
+        self.bdo_documentation_memo.generate(
+            self.risk_result.scoped_df,
+            self.coverage_result.summary,
+            export_paths["bdo_documentation_memo"],
+        )
+        self.component_instruction_pack.generate(
+            self.risk_result.scoped_df,
+            export_paths["component_instruction_pack"],
+        )
         return export_paths
 
     def _write_prediction_explanations(self, output_path: Path) -> None:
@@ -240,8 +266,24 @@ class GASCOAuditCrew:
             "",
             f"Risk Prediction Agent: {self.risk_result.summary}",
             f"Coverage Agent: {self.coverage_result.narrative}",
+            self._guardrail_summary(),
             f"Instruction Agent: {self.instruction_result.final_narrative}",
             "",
             "CrewAI execution: sequential crew completed with local deterministic LLM callbacks.",
             "Prediction engine: MLScopeEngine using models/scope_model.pkl.",
+            "Methodology guardrails: BDO-style post-ML validation applied before final exports.",
         ])
+
+    def _guardrail_summary(self) -> str:
+        assert self.risk_result is not None
+        review_count = int(self.risk_result.scoped_df["Requires_Human_Review"].sum())
+        adjusted_count = int(
+            (
+                self.risk_result.scoped_df["Original_ML_Scope"]
+                != self.risk_result.scoped_df["Guardrail_Adjusted_Scope"]
+            ).sum()
+        )
+        return (
+            f"BDO Guardrails: {adjusted_count} recommendations adjusted; "
+            f"{review_count} components require human review."
+        )

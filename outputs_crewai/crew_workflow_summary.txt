@@ -2,7 +2,9 @@ GASCO Phase 3A CrewAI Workflow Summary
 
 Risk Prediction Agent: Generated ML scope predictions for 10 entities. Distribution: {'Specific Procedures': 7, 'Analytical Procedures': 3}.
 Coverage Agent: Coverage is 85.65% with status: Sufficient audit coverage. Risky uncovered entities identified: 1.
+BDO Guardrails: 2 recommendations adjusted; 5 components require human review.
 Instruction Agent: CrewAI-orchestrated GASCO ML audit workflow completed. Coverage status: Sufficient audit coverage (85.65%). Prepared 10 component audit instructions with ML explanations.
 
 CrewAI execution: sequential crew completed with local deterministic LLM callbacks.
 Prediction engine: MLScopeEngine using models/scope_model.pkl.
+Methodology guardrails: BDO-style post-ML validation applied before final exports.

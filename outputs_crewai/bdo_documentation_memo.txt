@@ -1,0 +1,43 @@
+GASCO BDO-Style Scoping Documentation Memo
+
+Purpose
+This memo documents the ML-assisted component scope recommendation and the methodology guardrails applied before final review.
+
+ML-assisted scope recommendation
+The model produced recommendations for 10 components. Original ML distribution: {'Specific Procedures': 7, 'Analytical Procedures': 3}.
+
+Guardrail adjustments
+Guardrail-adjusted distribution: {'Specific Procedures': 5, 'Analytical Procedures': 3, 'Full Scope': 2}. Adjusted recommendations: 2.
+- USA_Sub: Specific Procedures -> Full Scope (Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.51 is below the 0.65 threshold.)
+- Germany_Sub: Specific Procedures -> Full Scope (Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.58 is below the 0.65 threshold.)
+- Brazil_Sub: Specific Procedures -> Specific Procedures (Severe prior findings noted; planned work should address the finding history. ML confidence 0.62 is below the 0.65 threshold.)
+- Mexico_Sub: Specific Procedures -> Specific Procedures (ML confidence 0.54 is below the 0.65 threshold.)
+- SouthAfrica_Sub: Specific Procedures -> Specific Procedures (Severe prior findings noted; planned work should address the finding history. ML confidence 0.57 is below the 0.65 threshold.)
+
+Basis for component selection
+- USA_Sub: Materiality | selected for work: Yes.
+- Germany_Sub: Materiality | selected for work: Yes.
+- Japan_Sub: Analytical review | selected for work: No.
+- Brazil_Sub: Risk / Prior findings | selected for work: Yes.
+- India_Sub: Risk | selected for work: Yes.
+- France_Sub: Analytical review | selected for work: Yes.
+- Australia_Sub: Analytical review | selected for work: No.
+- Mexico_Sub: Analytical review | selected for work: Yes.
+- Canada_Sub: Analytical review | selected for work: No.
+- SouthAfrica_Sub: Risk / Prior findings | selected for work: Yes.
+
+Coverage result
+Adjusted coverage is 85.65% (13430000000 of 15680000000 assets). Status: Sufficient audit coverage.
+
+Components requiring human review
+- USA_Sub: Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.51 is below the 0.65 threshold.
+- Germany_Sub: Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.58 is below the 0.65 threshold.
+- Brazil_Sub: Severe prior findings noted; planned work should address the finding history. ML confidence 0.62 is below the 0.65 threshold.
+- Mexico_Sub: ML confidence 0.54 is below the 0.65 threshold.
+- SouthAfrica_Sub: Severe prior findings noted; planned work should address the finding history. ML confidence 0.57 is below the 0.65 threshold.
+
+Professional judgment reminder
+The ML model is an assistive input. Final scoping decisions require engagement team evaluation, partner oversight where relevant, and documentation of professional judgment.
+
+Audit trail note
+The original ML recommendation, adjusted recommendation, guardrail action, reason, and review flag are retained in the exported scoping files.

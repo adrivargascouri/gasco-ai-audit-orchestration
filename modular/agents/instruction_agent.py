@@ -31,11 +31,16 @@ class InstructionAgent:
         rows = []
         for _, row in scoped_df.iterrows():
             entity = row["Entity"]
-            scope = row["Recommended_Scope"]
+            scope = row.get("Guardrail_Adjusted_Scope", row["Recommended_Scope"])
             rows.append({
                 "Entity": entity,
                 "Country": row["Country"],
                 "Risk_Level": row["Risk_Level"],
+                "Original_ML_Scope": row.get("Original_ML_Scope", row["Recommended_Scope"]),
+                "Guardrail_Adjusted_Scope": scope,
+                "Guardrail_Action": row.get("Guardrail_Action", "Accepted"),
+                "Guardrail_Reason": row.get("Guardrail_Reason", ""),
+                "Requires_Human_Review": row.get("Requires_Human_Review", False),
                 "Recommended_Scope": scope,
                 "Prediction_Confidence": row["Prediction_Confidence"],
                 "Audit_Instruction": self._instruction(entity, row["Country"], scope),

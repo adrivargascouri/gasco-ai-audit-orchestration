@@ -23,9 +23,14 @@ class CoverageAgent:
 
     def evaluate_coverage(self, scoped_df: pd.DataFrame) -> CoverageResult:
         """Calculate covered assets and risky uncovered entities."""
+        scope_column = (
+            "Guardrail_Adjusted_Scope"
+            if "Guardrail_Adjusted_Scope" in scoped_df.columns
+            else "Recommended_Scope"
+        )
         total_assets = scoped_df["Assets"].sum()
         covered_df = scoped_df[
-            scoped_df["Recommended_Scope"].isin(self.config.included_scopes)
+            scoped_df[scope_column].isin(self.config.included_scopes)
         ]
         covered_assets = covered_df["Assets"].sum()
         coverage_percentage = (
@@ -38,7 +43,7 @@ class CoverageAgent:
         )
 
         uncovered_df = scoped_df[
-            ~scoped_df["Recommended_Scope"].isin(self.config.included_scopes)
+            ~scoped_df[scope_column].isin(self.config.included_scopes)
         ].copy()
         risky_uncovered_df = uncovered_df[
             (uncovered_df["Risk_Level"] == "High")
