@@ -8,3 +8,4 @@ Instruction Agent: CrewAI-orchestrated GASCO ML audit workflow completed. Covera
 CrewAI execution: sequential crew completed with local deterministic LLM callbacks.
 Prediction engine: MLScopeEngine using models/scope_model.pkl.
 Methodology guardrails: BDO-style post-ML validation applied before final exports.
+Human-in-the-loop review: auditor workpaper and audit trail generated before final scoping approval.

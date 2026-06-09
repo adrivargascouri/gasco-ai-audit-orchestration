@@ -27,6 +27,7 @@ from modular.bdo.methodology_mapper import BDOMethodologyMapper
 from modular.config.config_schema import AppConfig
 from modular.data.loader import DataLoader
 from modular.export.csv_exporter import CSVExporter
+from modular.hitl.review_layer import HumanInTheLoopReviewLayer, HumanReviewArtifacts
 from modular.model.explainability import ScopeModelExplainability
 from modular.tools.ml_scope_prediction_tool import MLScopePredictionTool
 
@@ -79,6 +80,7 @@ class GASCOAuditCrew:
         self.bdo_methodology_mapper = BDOMethodologyMapper()
         self.bdo_documentation_memo = BDODocumentationMemo()
         self.component_instruction_pack = ComponentInstructionPack()
+        self.human_review_layer = HumanInTheLoopReviewLayer()
         self.coverage_agent = CoverageAgent(config.coverage)
         self.instruction_agent = InstructionAgent(config.audit)
         self.explainability = ScopeModelExplainability()
@@ -87,6 +89,7 @@ class GASCOAuditCrew:
         self.findings_df: pd.DataFrame | None = None
         self.risk_result: RiskPredictionResult | None = None
         self.guardrail_coverage_status: GuardrailCoverageStatus | None = None
+        self.human_review_artifacts: HumanReviewArtifacts | None = None
         self.coverage_result: CoverageResult | None = None
         self.instruction_result: InstructionResult | None = None
         self.crew_output: Any = None
@@ -184,6 +187,10 @@ class GASCOAuditCrew:
         )
         self.guardrail_coverage_status = guardrail_coverage_status
         self.risk_result.scoped_df = self.bdo_methodology_mapper.map_outputs(guarded_df)
+        self.human_review_artifacts = self.human_review_layer.prepare(
+            self.risk_result.scoped_df,
+            self.risk_result.explanations,
+        )
 
     def _run_coverage_stage(self, _task_output: Any) -> None:
         if self.risk_result is None:
@@ -202,7 +209,12 @@ class GASCOAuditCrew:
         )
 
     def _export_outputs(self) -> dict[str, Path]:
-        if self.risk_result is None or self.coverage_result is None or self.instruction_result is None:
+        if (
+            self.risk_result is None
+            or self.coverage_result is None
+            or self.instruction_result is None
+            or self.human_review_artifacts is None
+        ):
             raise RuntimeError("CrewAI workflow did not complete all stages")
 
         export_paths = {
@@ -227,6 +239,12 @@ class GASCOAuditCrew:
             "bdo_documentation_memo": self.output_directory / "bdo_documentation_memo.txt",
             "component_instruction_pack": self.output_directory / "component_auditor_instruction_pack.csv",
         }
+        export_paths.update(
+            self.human_review_layer.export(
+                self.human_review_artifacts,
+                self.output_directory,
+            )
+        )
 
         self.coverage_result.risky_uncovered_df.to_csv(
             export_paths["risky_uncovered"],
@@ -272,6 +290,7 @@ class GASCOAuditCrew:
             "CrewAI execution: sequential crew completed with local deterministic LLM callbacks.",
             "Prediction engine: MLScopeEngine using models/scope_model.pkl.",
             "Methodology guardrails: BDO-style post-ML validation applied before final exports.",
+            "Human-in-the-loop review: auditor workpaper and audit trail generated before final scoping approval.",
         ])
 
     def _guardrail_summary(self) -> str:

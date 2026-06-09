@@ -1,0 +1,11 @@
+component_name,ai_recommended_scope,hitl_review_reason,final_auditor_scope,decision_status,auditor_comment,approved_by,approval_date
+USA_Sub,Full Scope,Multiple review triggers: Low ML confidence; Significant component; Guardrail adjusted AI recommendation,,pending,,,
+Germany_Sub,Full Scope,Multiple review triggers: Low ML confidence; Significant component; Guardrail adjusted AI recommendation,,pending,,,
+Japan_Sub,Analytical Procedures,No mandatory HITL review trigger,,pending,,,
+Brazil_Sub,Specific Procedures,Multiple review triggers: Low ML confidence; High risk component,,pending,,,
+India_Sub,Specific Procedures,High risk component,,pending,,,
+France_Sub,Specific Procedures,No mandatory HITL review trigger,,pending,,,
+Australia_Sub,Analytical Procedures,No mandatory HITL review trigger,,pending,,,
+Mexico_Sub,Specific Procedures,Low ML confidence,,pending,,,
+Canada_Sub,Analytical Procedures,No mandatory HITL review trigger,,pending,,,
+SouthAfrica_Sub,Specific Procedures,Multiple review triggers: Low ML confidence; High risk component,,pending,,,

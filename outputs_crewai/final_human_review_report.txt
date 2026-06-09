@@ -1,0 +1,28 @@
+GASCO Human-in-the-Loop AI Review Report
+
+Purpose
+This report documents the Human-in-the-Loop AI Review Layer for audit scoping decisions.
+
+Core principle
+GASCO only suggests audit scoping decisions.
+The auditor makes the final decision.
+
+Human review policy
+Human review is required for low confidence, high risk, significant components, or guardrail adjustments.
+The hitl_review_reason field documents the stricter HITL policy and may differ from the legacy Requires_Human_Review guardrail flag.
+
+Current review status
+Components prepared for auditor review: 10.
+Components requiring human review: 6.
+Recommendations adjusted by guardrails: 2.
+Pending final auditor decisions: 10.
+
+Workflow
+AI Recommendation -> Auditor Review -> Final Auditor Decision -> Audit Trail
+
+Auditor workpaper
+Auditors should complete final_auditor_scope, decision_status, auditor_comment, approved_by, and approval_date before finalizing scoping.
+Allowed decision_status values: pending, accepted, modified, rejected.
+
+Audit trail
+The audit_trail.csv file retains the original AI recommendation, guardrail-adjusted recommendation, final auditor decision fields, timestamp, and reason for change.
