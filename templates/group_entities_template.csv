@@ -1,0 +1,7 @@
+entity_name,country,ownership_percentage,currency,assets,revenue,liabilities,employees,risk_level,manual_risk_flag
+GASCO Holdings Ltd,United Kingdom,100,GBP,285000000,410000000,132000000,620,Medium,No
+GASCO Manufacturing GmbH,Germany,85,EUR,142000000,225000000,76000000,410,High,Yes
+GASCO Trading LLC,United Arab Emirates,75,AED,98000000,185000000,54000000,185,Medium,No
+GASCO Services Pte Ltd,Singapore,80,SGD,64000000,92000000,31000000,140,Low,No
+GASCO Energy Inc,United States,70,USD,176000000,268000000,94000000,360,High,Yes
+GASCO Logistics SA,Spain,90,EUR,72000000,118000000,39000000,220,Medium,No

@@ -1,0 +1,7 @@
+entity_name,finding_description,severity,year,status,department
+GASCO Holdings Ltd,Intercompany reconciliation delay identified,Medium,2025,Open,Finance
+GASCO Manufacturing GmbH,Inventory valuation controls require remediation,High,2025,Open,Operations
+GASCO Trading LLC,Vendor onboarding documentation incomplete,Medium,2025,In Progress,Procurement
+GASCO Services Pte Ltd,Expense approval evidence not consistently retained,Low,2025,Finance
+GASCO Energy Inc,Revenue cut off testing exception noted,High,2025,Open,Sales
+GASCO Logistics SA,Fixed asset register update lag observed,Medium,2025,Closed,Operations
