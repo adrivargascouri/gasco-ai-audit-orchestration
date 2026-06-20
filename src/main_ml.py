@@ -1,4 +1,4 @@
-"""ML-based modular entry point for audit scope orchestration."""
+"""ML-only standalone GASCO pipeline retained for historical comparison."""
 import sys
 from pathlib import Path
 

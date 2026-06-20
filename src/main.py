@@ -1,3 +1,5 @@
+"""Legacy rule-based GASCO pipeline retained for historical comparison."""
+
 import os
 import pandas as pd
 from data_ingestion import load_group_data

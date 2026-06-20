@@ -1,4 +1,4 @@
-"""CrewAI entry point for the GASCO ML audit workflow."""
+"""Current primary GASCO pipeline: the CrewAI-orchestrated ML audit workflow."""
 import os
 import sys
 from pathlib import Path

@@ -1,7 +1,6 @@
-"""New modular entry point for audit scope orchestration.
+"""Modular rule-based GASCO comparison pipeline.
 
-This is the Phase 1 modular implementation using the new architecture.
-It produces the same outputs as src/main.py for parity testing.
+This path is retained for parity testing against the legacy rule-based pipeline.
 """
 import sys
 from pathlib import Path
