@@ -1,0 +1,4 @@
+entity_name,country,total_assets,revenue,risk_level
+Northwind Germany GmbH,Germany,125000000,98000000,Medium
+Northwind Brazil Ltda,Brazil,45000000,37000000,High
+Northwind Canada Inc,Canada,70000000,62000000,Low

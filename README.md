@@ -83,8 +83,34 @@ The primary pipeline uses these repository files:
 | `data/raw/historical_audit_data.csv` | Historical country-risk reference data; the current engine falls back to defaults if it is absent |
 | `models/scope_model.pkl` | Persisted local scope classification model used for inference |
 
-The CSV files under `templates/` support a separate client-data intake workflow;
-`src/main_crewai.py` does not currently read them.
+## Using GASCO with company-provided CSV data
+
+Company users can run the official pipeline with CSV files only; no programming
+or JSON editing is required. Start with the files in `data/templates/`:
+
+- `company_group_structure_template.csv`
+- `company_findings_template.csv`
+
+Keep the header names unchanged, replace the example rows with company data, and
+save the completed files in `data/client_uploads/`. Do not commit real client data.
+
+The group structure file requires `entity_name`, `country`, `total_assets`,
+`revenue`, and `risk_level`. Assets and revenue must be non-negative numbers.
+The findings file requires `entity_name`, `finding_description`, `severity`, and
+`year`; `year` may be blank, but must be a whole number when provided. Accepted
+values for both `risk_level` and `severity` are `Low`, `Medium`, `High`, and
+`Critical`.
+
+Run GASCO from the repository root with both completed files:
+
+```powershell
+python src/main_crewai.py --group-file data/client_uploads/company_group_structure.csv --findings-file data/client_uploads/company_findings.csv
+```
+
+The findings file is optional. Omit `--findings-file` to use the existing default
+findings repository. Omitting both arguments preserves the existing default run.
+Invalid files are rejected before the pipeline starts, with row-specific messages
+that explain what needs to be corrected.
 
 ## Outputs
 

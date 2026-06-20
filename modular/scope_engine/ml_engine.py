@@ -5,6 +5,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from modular.data.loader import DataLoader
 from modular.features.encoders import ManualRiskFlagEncoder, RiskLevelEncoder
 from modular.model.local_inference import ScopeModelInference
 from modular.model.model_registry import (
@@ -186,7 +187,7 @@ class MLScopeEngine(ScopeRecommendationEngine):
     def _load_findings_data(self) -> pd.DataFrame:
         if not self.findings_data_path.exists():
             return pd.DataFrame(columns=["Entity", "Severity"])
-        return pd.read_csv(self.findings_data_path)
+        return DataLoader.load_findings_dataframe(self.findings_data_path)
 
     def _percentage(self, value: float, total: float) -> float:
         return round((value / total * 100), 4) if total else 0.0

@@ -3,6 +3,10 @@ from pathlib import Path
 from typing import Tuple
 import pandas as pd
 from ..domain.models import Entity, Finding
+from .company_csv_validator import (
+    load_company_findings,
+    load_company_group_structure,
+)
 
 
 class DataLoader:
@@ -22,9 +26,23 @@ class DataLoader:
         Returns:
             Tuple of (group_df, findings_df)
         """
-        group_df = pd.read_json(str(group_path))
-        findings_df = pd.read_csv(str(findings_path))
+        group_path = Path(group_path)
+        group_df = (
+            load_company_group_structure(group_path)
+            if group_path.suffix.lower() == ".csv"
+            else pd.read_json(str(group_path))
+        )
+        findings_df = DataLoader.load_findings_dataframe(findings_path)
         return group_df, findings_df
+
+    @staticmethod
+    def load_findings_dataframe(findings_path: str | Path) -> pd.DataFrame:
+        """Load either the internal findings CSV or a company findings CSV."""
+        dataframe = pd.read_csv(str(findings_path), encoding="utf-8-sig")
+        normalized_columns = {str(column).strip() for column in dataframe.columns}
+        if "entity_name" in normalized_columns:
+            return load_company_findings(findings_path)
+        return dataframe
 
     @staticmethod
     def load_entities(group_path: str | Path = "data/group_structure.json") -> list[Entity]:

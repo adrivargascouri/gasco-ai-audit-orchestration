@@ -1,0 +1,4 @@
+entity_name,finding_description,severity,year
+Northwind Germany GmbH,Delayed account reconciliation,Medium,2025
+Northwind Brazil Ltda,Inventory controls require remediation,High,2024
+Northwind Canada Inc,Prior reporting issue has been resolved,Low,2023

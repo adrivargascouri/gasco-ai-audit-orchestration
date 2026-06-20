@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -31,9 +32,17 @@ class MLScopePredictionTool(BaseTool):
     )
     args_schema: type[BaseModel] = MLScopePredictionInput
 
-    def __init__(self, **kwargs: Any):
+    def __init__(
+        self,
+        findings_data_path: str | Path = "data/findings_repo.csv",
+        **kwargs: Any,
+    ):
         super().__init__(**kwargs)
-        object.__setattr__(self, "scope_engine", MLScopeEngine())
+        object.__setattr__(
+            self,
+            "scope_engine",
+            MLScopeEngine(findings_data_path=findings_data_path),
+        )
         object.__setattr__(self, "explainer", ScopeModelExplainability())
 
     def _run(self, entities_json: str) -> str:

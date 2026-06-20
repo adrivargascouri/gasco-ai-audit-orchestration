@@ -74,7 +74,9 @@ class GASCOAuditCrew:
 
         self.data_loader = DataLoader()
         self.csv_exporter = CSVExporter(self.output_directory)
-        self.prediction_tool = MLScopePredictionTool()
+        self.prediction_tool = MLScopePredictionTool(
+            findings_data_path=config.findings_data_path
+        )
         self.risk_prediction_agent = RiskPredictionAgent(self.prediction_tool)
         self.bdo_guardrails = BDOGuardrails(config.bdo_guardrails)
         self.bdo_methodology_mapper = BDOMethodologyMapper()
@@ -265,10 +267,20 @@ class GASCOAuditCrew:
 
     def _write_prediction_explanations(self, output_path: Path) -> None:
         assert self.risk_result is not None
+        preferred_entities = ["USA_Sub", "Germany_Sub", "Brazil_Sub"]
+        selected_entities = [
+            entity
+            for entity in preferred_entities
+            if entity in self.risk_result.explanations
+        ]
+        selected_entities.extend(
+            entity
+            for entity in self.risk_result.explanations
+            if entity not in selected_entities
+        )
         sections = [
             self.risk_result.explanations[entity]
-            for entity in ["USA_Sub", "Germany_Sub", "Brazil_Sub"]
-            if entity in self.risk_result.explanations
+            for entity in selected_entities[:3]
         ]
         output_path.write_text("\n\n".join(sections), encoding="utf-8")
 
