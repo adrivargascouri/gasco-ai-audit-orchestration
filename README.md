@@ -133,6 +133,8 @@ The primary run generates these artifacts in `outputs_crewai/`:
 | `group_audit_instructions.csv` | Component-level audit instructions based on adjusted scope |
 | `risky_uncovered_entities.csv` | Risky components outside the scopes included in coverage |
 | `feature_importance.csv` | Feature importance from the persisted classifier |
+| `identified_risks.csv` | Deterministic risks discovered from the same group and findings data used by the official run |
+| `risk_review_workpaper.csv` | Auditor review workpaper for discovered risks, with pending status for high-severity, low-confidence, or significant-component risks |
 | `prediction_explanations.txt` | Selected human-readable ML prediction explanations |
 | `crew_workflow_summary.txt` | Deterministic CrewAI stage summary |
 | `bdo_documentation_memo.txt` | Methodology-oriented scoping and coverage memo |
@@ -141,6 +143,14 @@ The primary run generates these artifacts in `outputs_crewai/`:
 | `auditor_review_workpaper.csv` | Blank/pending auditor decision template |
 | `audit_trail.csv` | Initial audit-trail rows with pending final-decision fields |
 | `final_human_review_report.txt` | HITL status report and completion guidance |
+
+### Risk discovery review outputs
+
+The official pipeline also runs the existing deterministic Risk Discovery Agent
+after the CrewAI workflow has completed. `identified_risks.csv` preserves the raw
+discovered risk records. `risk_review_workpaper.csv` adds auditor-review fields:
+high or critical risks, low-confidence risks, and significant component risks are
+marked `Pending`; all other discovered risks are marked `Not Required`.
 
 The pipeline does not clear an output directory before running. A file present in
 `outputs_crewai/` but not listed above may be an artifact from another or older

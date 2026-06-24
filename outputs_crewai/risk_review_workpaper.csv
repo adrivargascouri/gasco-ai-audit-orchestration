@@ -1,0 +1,5 @@
+entity_name,risk_type,risk_description,severity,source,evidence_value,confidence,requires_human_review,auditor_comment,review_status
+USA_Sub,Significant Component Risk,Entity assets are at least 15% of total group assets.,High,financial_data,0.4464,1.0,True,,Pending
+Germany_Sub,Significant Component Risk,Entity assets are at least 15% of total group assets.,High,financial_data,0.2551,1.0,True,,Pending
+Brazil_Sub,High Finding Risk,High-severity finding identified: Weak inventory controls,High,findings,High,1.0,True,,Pending
+SouthAfrica_Sub,High Finding Risk,High-severity finding identified: Cash handling issues,High,findings,High,1.0,True,,Pending

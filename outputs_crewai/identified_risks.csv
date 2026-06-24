@@ -1,8 +1,5 @@
 entity_name,risk_type,risk_description,severity,source,evidence_value,confidence
-GASCO Holdings Ltd,Significant Component Risk,Entity assets are at least 15% of total group assets for 2025.,High,financial_data,0.3405,1.0
-GASCO Manufacturing GmbH,Significant Component Risk,Entity assets are at least 15% of total group assets for 2025.,High,financial_data,0.1697,1.0
-GASCO Energy Inc,Significant Component Risk,Entity assets are at least 15% of total group assets for 2025.,High,financial_data,0.2103,1.0
-GASCO Manufacturing GmbH,High Finding Risk,High-severity finding identified: Inventory valuation controls require remediation,High,findings,High,1.0
-GASCO Energy Inc,High Finding Risk,High-severity finding identified: Revenue cut off testing exception noted,High,findings,High,1.0
-GASCO Manufacturing GmbH,Manual Risk Flag,Entity was manually flagged for risk review.,Medium,group_entities,Yes,1.0
-GASCO Energy Inc,Manual Risk Flag,Entity was manually flagged for risk review.,Medium,group_entities,Yes,1.0
+USA_Sub,Significant Component Risk,Entity assets are at least 15% of total group assets.,High,financial_data,0.4464,1.0
+Germany_Sub,Significant Component Risk,Entity assets are at least 15% of total group assets.,High,financial_data,0.2551,1.0
+Brazil_Sub,High Finding Risk,High-severity finding identified: Weak inventory controls,High,findings,High,1.0
+SouthAfrica_Sub,High Finding Risk,High-severity finding identified: Cash handling issues,High,findings,High,1.0

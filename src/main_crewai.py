@@ -15,11 +15,26 @@ os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from modular.config.loader import ConfigLoader
+from modular.agents.risk_discovery_agent import discover_risks
 from modular.crew.audit_crew import GASCOAuditCrew
 from modular.data.company_csv_validator import (
     validate_findings_csv,
     validate_group_structure_csv,
 )
+
+
+RISK_REVIEW_COLUMNS = [
+    "entity_name",
+    "risk_type",
+    "risk_description",
+    "severity",
+    "source",
+    "evidence_value",
+    "confidence",
+    "requires_human_review",
+    "auditor_comment",
+    "review_status",
+]
 
 
 def _parse_args() -> argparse.Namespace:
@@ -57,6 +72,83 @@ def _parse_args() -> argparse.Namespace:
     return args
 
 
+def _risk_discovery_input(
+    group_df: pd.DataFrame,
+    findings_df: pd.DataFrame,
+) -> dict[str, pd.DataFrame]:
+    """Adapt official pipeline dataframes to the risk discovery agent input shape."""
+    financial_data = pd.DataFrame({
+        "entity_name": group_df.get("Entity", pd.Series(dtype=object)),
+        "total_assets": group_df.get("Assets", pd.Series(dtype=float)),
+    })
+
+    findings = pd.DataFrame({
+        "entity_name": findings_df.get("Entity", pd.Series(dtype=object)),
+        "finding_description": findings_df.get("Finding", pd.Series(dtype=object)),
+        "severity": findings_df.get("Severity", pd.Series(dtype=object)),
+    })
+
+    group_entities = pd.DataFrame({
+        "entity_name": group_df.get("Entity", pd.Series(dtype=object)),
+        "manual_risk_flag": group_df.get("manual_risk_flag", pd.Series(dtype=object)),
+    })
+
+    return {
+        "financial_data": financial_data,
+        "findings": findings,
+        "group_entities": group_entities,
+    }
+
+
+def _build_risk_review_workpaper(identified_risks: pd.DataFrame) -> pd.DataFrame:
+    """Create the auditor review workpaper from discovered risks."""
+    workpaper = identified_risks.copy()
+    confidence = pd.to_numeric(workpaper["confidence"], errors="coerce")
+    requires_human_review = (
+        workpaper["severity"].astype(str).str.strip().str.casefold().isin(
+            {"high", "critical"}
+        )
+        | confidence.lt(0.70)
+        | workpaper["risk_type"].astype(str).str.contains(
+            "Significant Component Risk",
+            case=False,
+            na=False,
+        )
+    )
+
+    workpaper["requires_human_review"] = requires_human_review
+    workpaper["auditor_comment"] = ""
+    workpaper["review_status"] = requires_human_review.map({
+        True: "Pending",
+        False: "Not Required",
+    })
+
+    return workpaper[RISK_REVIEW_COLUMNS]
+
+
+def _export_risk_discovery_outputs(
+    audit_crew: GASCOAuditCrew,
+    output_directory: Path,
+) -> dict[str, Path]:
+    """Run deterministic risk discovery and export review-ready artifacts."""
+    if audit_crew.group_df is None or audit_crew.findings_df is None:
+        raise RuntimeError("Risk discovery requires loaded group and findings data")
+
+    client_data = _risk_discovery_input(audit_crew.group_df, audit_crew.findings_df)
+    identified_risks = discover_risks(client_data)
+    risk_workpaper = _build_risk_review_workpaper(identified_risks)
+
+    identified_risks_path = output_directory / "identified_risks.csv"
+    risk_workpaper_path = output_directory / "risk_review_workpaper.csv"
+    identified_risks.to_csv(identified_risks_path, index=False)
+    risk_workpaper.to_csv(risk_workpaper_path, index=False)
+
+    return {
+        "identified_risks": identified_risks_path,
+        "risk_review_workpaper": risk_workpaper_path,
+    }
+
+
 def main() -> None:
     args = _parse_args()
     config_path = Path(__file__).parent.parent / "modular" / "data" / "config.yaml"
@@ -70,6 +162,11 @@ def main() -> None:
 
     audit_crew = GASCOAuditCrew(config)
     results = audit_crew.run()
+    risk_discovery_paths = _export_risk_discovery_outputs(
+        audit_crew,
+        Path(config.output_directory),
+    )
+    results["export_paths"].update(risk_discovery_paths)
 
     risk_result = results["risk_result"]
     coverage_result = results["coverage_result"]
@@ -126,6 +223,11 @@ def main() -> None:
     print("\n\nExported files:")
     for name, path in results["export_paths"].items():
         print(f"  {name}: {path}")
+    print(f"Identified risks saved to: {risk_discovery_paths['identified_risks']}")
+    print(
+        "Risk review workpaper saved to: "
+        f"{risk_discovery_paths['risk_review_workpaper']}"
+    )
 
 
 if __name__ == "__main__":
