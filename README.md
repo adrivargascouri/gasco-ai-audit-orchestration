@@ -141,6 +141,7 @@ The primary run generates these artifacts in `outputs_crewai/`:
 | `component_auditor_instruction_pack.csv` | Component auditor instruction pack |
 | `human_review_ai_recommendations.csv` | AI recommendations and evidence prepared for auditor review |
 | `auditor_review_workpaper.csv` | Blank/pending auditor decision template |
+| `auditor_feedback.csv` | Structured auditor decision labels derived from the auditor review workpaper for future ML improvement |
 | `audit_trail.csv` | Initial audit-trail rows with pending final-decision fields |
 | `final_human_review_report.txt` | HITL status report and completion guidance |
 
@@ -152,6 +153,19 @@ discovered risk records. `risk_review_workpaper.csv` adds auditor-review fields:
 high or critical risks, low-confidence risks, and significant component risks are
 marked `Pending`; all other discovered risks are marked `Not Required`.
 
+### Auditor feedback loop
+
+The official pipeline creates `auditor_feedback.csv` from
+`auditor_review_workpaper.csv` on every run. It stores each entity's AI
+recommended scope, final auditor scope, decision status, auditor comment,
+feedback label, feedback reason, and whether the row is usable for future
+training.
+
+This file does not retrain the local ML model yet. It prepares labeled human
+decisions so a future model-improvement or retraining workflow can distinguish
+accepted AI recommendations from auditor overrides while leaving pending
+decisions out of training data.
+
 The pipeline does not clear an output directory before running. A file present in
 `outputs_crewai/` but not listed above may be an artifact from another or older
 workflow and should not be attributed to the latest primary run without checking
@@ -162,8 +176,8 @@ its provenance.
 - CrewAI orchestration is deterministic and sequential.
 - `LocalCrewLLM` is a local stub/shim used to satisfy CrewAI orchestration; it does
   not perform generative reasoning or call an external LLM.
-- HITL currently generates review templates and pending audit-trail fields, but it
-  does not ingest completed auditor decisions back into the pipeline.
+- HITL currently generates review templates, pending audit-trail fields, and
+  auditor feedback labels, but it does not retrain the ML model.
 - Older rule-based, modular comparison, and standalone ML pipelines remain for
   historical comparison and may produce different output families.
 - Automated tests are not yet implemented.

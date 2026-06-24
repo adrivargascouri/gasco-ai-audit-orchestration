@@ -1,0 +1,11 @@
+entity_name,ai_recommended_scope,final_auditor_scope,decision_status,auditor_comment,feedback_label,feedback_reason,usable_for_training
+USA_Sub,Full Scope,,pending,,Pending,Awaiting auditor decision,False
+Germany_Sub,Full Scope,,pending,,Pending,Awaiting auditor decision,False
+Japan_Sub,Analytical Procedures,,pending,,Pending,Awaiting auditor decision,False
+Brazil_Sub,Specific Procedures,,pending,,Pending,Awaiting auditor decision,False
+India_Sub,Specific Procedures,,pending,,Pending,Awaiting auditor decision,False
+France_Sub,Specific Procedures,,pending,,Pending,Awaiting auditor decision,False
+Australia_Sub,Analytical Procedures,,pending,,Pending,Awaiting auditor decision,False
+Mexico_Sub,Specific Procedures,,pending,,Pending,Awaiting auditor decision,False
+Canada_Sub,Analytical Procedures,,pending,,Pending,Awaiting auditor decision,False
+SouthAfrica_Sub,Specific Procedures,,pending,,Pending,Awaiting auditor decision,False
