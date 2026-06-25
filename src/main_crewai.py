@@ -21,7 +21,7 @@ from modular.data.company_csv_validator import (
     validate_findings_csv,
     validate_group_structure_csv,
 )
-from modular.hitl.auditor_feedback import generate_auditor_feedback
+from modular.hitl.final_approval import run_final_approval_workflow
 
 
 RISK_REVIEW_COLUMNS = [
@@ -167,9 +167,9 @@ def main() -> None:
         audit_crew,
         Path(config.output_directory),
     )
-    auditor_feedback_path = generate_auditor_feedback(config.output_directory)
+    final_approval_paths = run_final_approval_workflow(config.output_directory)
     results["export_paths"].update(risk_discovery_paths)
-    results["export_paths"]["auditor_feedback"] = auditor_feedback_path
+    results["export_paths"].update(final_approval_paths)
 
     risk_result = results["risk_result"]
     coverage_result = results["coverage_result"]
@@ -231,7 +231,11 @@ def main() -> None:
         "Risk review workpaper saved to: "
         f"{risk_discovery_paths['risk_review_workpaper']}"
     )
-    print(f"Auditor feedback saved to: {auditor_feedback_path}")
+    print(
+        "Final approved scope saved to: "
+        f"{final_approval_paths['final_approved_scope']}"
+    )
+    print(f"Auditor feedback saved to: {final_approval_paths['auditor_feedback']}")
 
 
 if __name__ == "__main__":

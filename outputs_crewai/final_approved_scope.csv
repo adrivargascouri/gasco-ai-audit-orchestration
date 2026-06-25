@@ -1,0 +1,11 @@
+component_name,ai_recommended_scope,final_auditor_scope,auditor_override,final_decision_source
+USA_Sub,Full Scope,Full Scope,False,ai_default
+Germany_Sub,Full Scope,Full Scope,False,ai_default
+Japan_Sub,Analytical Procedures,Analytical Procedures,False,ai_default
+Brazil_Sub,Specific Procedures,Specific Procedures,False,ai_default
+India_Sub,Specific Procedures,Specific Procedures,False,ai_default
+France_Sub,Specific Procedures,Specific Procedures,False,ai_default
+Australia_Sub,Analytical Procedures,Analytical Procedures,False,ai_default
+Mexico_Sub,Specific Procedures,Specific Procedures,False,ai_default
+Canada_Sub,Analytical Procedures,Analytical Procedures,False,ai_default
+SouthAfrica_Sub,Specific Procedures,Specific Procedures,False,ai_default
