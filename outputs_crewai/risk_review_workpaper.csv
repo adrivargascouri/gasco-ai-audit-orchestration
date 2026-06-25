@@ -1,5 +1,10 @@
 entity_name,risk_type,risk_description,severity,source,evidence_value,confidence,requires_human_review,auditor_comment,review_status
-USA_Sub,Significant Component Risk,Entity assets are at least 15% of total group assets.,High,financial_data,0.4464,1.0,True,,Pending
-Germany_Sub,Significant Component Risk,Entity assets are at least 15% of total group assets.,High,financial_data,0.2551,1.0,True,,Pending
-Brazil_Sub,High Finding Risk,High-severity finding identified: Weak inventory controls,High,findings,High,1.0,True,,Pending
-SouthAfrica_Sub,High Finding Risk,High-severity finding identified: Cash handling issues,High,findings,High,1.0,True,,Pending
+Northwind Germany GmbH,Liquidity Risk,Liquidity ratio is below 1.2 for 2025.,Medium,financial_data,1.1,1.0,False,,Not Required
+Northwind Germany GmbH,High Debt Risk,Debt ratio is above 0.6 for 2025.,Medium,financial_data,0.65,1.0,False,,Not Required
+Northwind Germany GmbH,Significant Component Risk,Entity assets are at least 15% of total group assets for 2025.,High,financial_data,0.5208,1.0,True,,Pending
+Northwind Brazil Ltda,Liquidity Risk,Liquidity ratio is below 1.2 for 2025.,High,financial_data,0.85,1.0,True,,Pending
+Northwind Brazil Ltda,High Debt Risk,Debt ratio is above 0.6 for 2025.,High,financial_data,0.8,1.0,True,,Pending
+Northwind Brazil Ltda,Significant Component Risk,Entity assets are at least 15% of total group assets for 2025.,High,financial_data,0.1875,1.0,True,,Pending
+Northwind Canada Inc,Significant Component Risk,Entity assets are at least 15% of total group assets for 2025.,High,financial_data,0.2917,1.0,True,,Pending
+Northwind Brazil Ltda,High Finding Risk,High-severity finding identified: Inventory controls require remediation,High,findings,High,1.0,True,,Pending
+Northwind Canada Inc,Manual Risk Flag,Entity was manually flagged for risk review.,Medium,group_entities,Yes,1.0,False,,Not Required

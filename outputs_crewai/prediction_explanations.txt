@@ -1,26 +1,26 @@
-USA_Sub was predicted as Specific Procedures with 51.33% confidence.
+Northwind Germany GmbH was predicted as Full Scope with 49.33% confidence.
 The model likely weighted these signals most heavily:
-- low risk level; risk_level_encoded is a top model feature (0.210)
+- medium risk level; risk_level_encoded is a top model feature (0.210)
 - low liquidity_ratio (1.31), consistent with higher audit attention (0.188)
 - manual risk flag enabled; this is a high-importance model signal (0.146)
-- high assets_percentage (44.64%), above the training upper quartile (13.20%)
-- large model-scale assets (53,334,438), above the training upper quartile
-Class probabilities: Analytical Procedures 11.33%, Specific Procedures 51.33%, Full Scope 37.33%.
+- high assets_percentage (52.08%), above the training upper quartile (13.20%)
+- large model-scale assets (62,223,412), above the training upper quartile
+Class probabilities: Analytical Procedures 2.00%, Specific Procedures 48.67%, Full Scope 49.33%.
 
-Germany_Sub was predicted as Specific Procedures with 57.67% confidence.
-The model likely weighted these signals most heavily:
-- low risk level; risk_level_encoded is a top model feature (0.210)
-- low liquidity_ratio (1.22), consistent with higher audit attention (0.188)
-- manual risk flag enabled; this is a high-importance model signal (0.146)
-- high assets_percentage (25.51%), above the training upper quartile (13.20%)
-- large model-scale assets (30,476,788), above the training upper quartile
-Class probabilities: Analytical Procedures 11.33%, Specific Procedures 57.67%, Full Scope 31.00%.
-
-Brazil_Sub was predicted as Specific Procedures with 61.67% confidence.
+Northwind Brazil Ltda was predicted as Specific Procedures with 59.67% confidence.
 The model likely weighted these signals most heavily:
 - high risk level; risk_level_encoded is a top model feature (0.210)
-- moderate liquidity_ratio (1.60) (0.188)
+- moderate liquidity_ratio (1.58) (0.188)
 - manual risk flag enabled; this is a high-importance model signal (0.146)
-- low assets_percentage (3.19%), below the training lower quartile (5.90%)
-- model-scale assets (3,809,628)
-Class probabilities: Analytical Procedures 29.67%, Specific Procedures 61.67%, Full Scope 8.67%.
+- high assets_percentage (18.75%), above the training upper quartile (13.20%)
+- large model-scale assets (22,400,442), above the training upper quartile
+Class probabilities: Analytical Procedures 1.33%, Specific Procedures 59.67%, Full Scope 39.00%.
+
+Northwind Canada Inc was predicted as Specific Procedures with 56.00% confidence.
+The model likely weighted these signals most heavily:
+- low risk level; risk_level_encoded is a top model feature (0.210)
+- low liquidity_ratio (1.21), consistent with higher audit attention (0.188)
+- manual risk flag enabled; this is a high-importance model signal (0.146)
+- high assets_percentage (29.17%), above the training upper quartile (13.20%)
+- large model-scale assets (34,845,173), above the training upper quartile
+Class probabilities: Analytical Procedures 7.33%, Specific Procedures 56.00%, Full Scope 36.67%.

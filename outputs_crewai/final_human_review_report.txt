@@ -12,10 +12,10 @@ Human review is required for low confidence, high risk, significant components, 
 The hitl_review_reason field documents the stricter HITL policy and may differ from the legacy Requires_Human_Review guardrail flag.
 
 Current review status
-Components prepared for auditor review: 10.
-Components requiring human review: 6.
+Components prepared for auditor review: 3.
+Components requiring human review: 3.
 Recommendations adjusted by guardrails: 2.
-Pending final auditor decisions: 10.
+Pending final auditor decisions: 3.
 
 Workflow
 AI Recommendation -> Auditor Review -> Final Auditor Decision -> Audit Trail

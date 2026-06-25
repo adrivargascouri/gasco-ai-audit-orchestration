@@ -44,7 +44,12 @@ class RiskDiscoveryAgent:
             return []
 
         financial_df = financial_data.copy()
-        for column in ["liquidity_ratio", "debt_ratio", "total_assets"]:
+        for column in [
+            "liquidity_ratio",
+            "debt_ratio",
+            "total_assets",
+            "asset_percentage",
+        ]:
             if column in financial_df.columns:
                 financial_df[column] = pd.to_numeric(financial_df[column], errors="coerce")
 
@@ -85,13 +90,13 @@ class RiskDiscoveryAgent:
                     )
                 )
 
-            total_assets = row.get("total_assets")
-            if (
-                total_group_assets > 0
-                and pd.notna(total_assets)
-                and total_assets / total_group_assets >= 0.15
-            ):
-                assets_percentage = total_assets / total_group_assets
+            assets_percentage = row.get("asset_percentage")
+            if pd.isna(assets_percentage):
+                total_assets = row.get("total_assets")
+                if total_group_assets > 0 and pd.notna(total_assets):
+                    assets_percentage = total_assets / total_group_assets
+
+            if pd.notna(assets_percentage) and assets_percentage >= 0.15:
                 risks.append(
                     self._risk_row(
                         entity_name=entity_name,

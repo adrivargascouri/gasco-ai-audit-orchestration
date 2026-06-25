@@ -1,11 +1,4 @@
 entity_name,ai_recommended_scope,final_auditor_scope,decision_status,auditor_comment,feedback_label,feedback_reason,usable_for_training
-USA_Sub,Full Scope,Full Scope,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-Germany_Sub,Full Scope,Full Scope,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-Japan_Sub,Analytical Procedures,Analytical Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-Brazil_Sub,Specific Procedures,Specific Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-India_Sub,Specific Procedures,Specific Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-France_Sub,Specific Procedures,Specific Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-Australia_Sub,Analytical Procedures,Analytical Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-Mexico_Sub,Specific Procedures,Specific Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-Canada_Sub,Analytical Procedures,Analytical Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
-SouthAfrica_Sub,Specific Procedures,Specific Procedures,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
+Northwind Germany GmbH,Full Scope,Full Scope,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
+Northwind Brazil Ltda,Full Scope,Full Scope,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False
+Northwind Canada Inc,Full Scope,Full Scope,ai_default,,AI Default,No auditor scope provided; AI recommendation used as final default,False

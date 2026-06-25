@@ -90,6 +90,7 @@ or JSON editing is required. Start with the files in `data/templates/`:
 
 - `company_group_structure_template.csv`
 - `company_findings_template.csv`
+- `company_financial_data_template.csv`
 
 Keep the header names unchanged, replace the example rows with company data, and
 save the completed files in `data/client_uploads/`. Do not commit real client data.
@@ -99,18 +100,23 @@ The group structure file requires `entity_name`, `country`, `total_assets`,
 The findings file requires `entity_name`, `finding_description`, `severity`, and
 `year`; `year` may be blank, but must be a whole number when provided. Accepted
 values for both `risk_level` and `severity` are `Low`, `Medium`, `High`, and
-`Critical`.
+`Critical`. The financial data file requires `entity_name`, `year`,
+`current_assets`, `current_liabilities`, `total_assets`, `total_revenue`,
+`net_income`, `liquidity_ratio`, and `debt_ratio`; entity names are matched to
+the group structure by component/entity name. It may also include
+`manual_risk_flag`.
 
-Run GASCO from the repository root with both completed files:
+Run GASCO from the repository root with completed files:
 
 ```powershell
-python src/main_crewai.py --group-file data/client_uploads/company_group_structure.csv --findings-file data/client_uploads/company_findings.csv
+python src/main_crewai.py --group-file data/client_uploads/company_group_structure.csv --findings-file data/client_uploads/company_findings.csv --financial-file data/client_uploads/company_financial_data.csv
 ```
 
-The findings file is optional. Omit `--findings-file` to use the existing default
-findings repository. Omitting both arguments preserves the existing default run.
-Invalid files are rejected before the pipeline starts, with row-specific messages
-that explain what needs to be corrected.
+The findings and financial files are optional. Omit `--findings-file` to use the
+existing default findings repository. Omit `--financial-file` to use group assets
+only for deterministic risk discovery. Omitting all three arguments preserves the
+existing default run. Invalid files are rejected before the pipeline starts, with
+row-specific messages that explain what needs to be corrected.
 
 ## Outputs
 
@@ -133,7 +139,7 @@ The primary run generates these artifacts in `outputs_crewai/`:
 | `group_audit_instructions.csv` | Component-level audit instructions based on adjusted scope |
 | `risky_uncovered_entities.csv` | Risky components outside the scopes included in coverage |
 | `feature_importance.csv` | Feature importance from the persisted classifier |
-| `identified_risks.csv` | Deterministic risks discovered from the same group and findings data used by the official run |
+| `identified_risks.csv` | Deterministic risks discovered from the same group, findings, and optional financial data used by the official run |
 | `risk_review_workpaper.csv` | Auditor review workpaper for discovered risks, with pending status for high-severity, low-confidence, or significant-component risks |
 | `prediction_explanations.txt` | Selected human-readable ML prediction explanations |
 | `crew_workflow_summary.txt` | Deterministic CrewAI stage summary |
@@ -148,10 +154,13 @@ The primary run generates these artifacts in `outputs_crewai/`:
 ### Risk discovery review outputs
 
 The official pipeline also runs the existing deterministic Risk Discovery Agent
-after the CrewAI workflow has completed. `identified_risks.csv` preserves the raw
-discovered risk records. `risk_review_workpaper.csv` adds auditor-review fields:
-high or critical risks, low-confidence risks, and significant component risks are
-marked `Pending`; all other discovered risks are marked `Not Required`.
+after the CrewAI workflow has completed. When `--financial-file` is provided,
+validated financial indicators are aligned to group entities and can produce
+liquidity, debt, significant-component, and manual-flag risks.
+`identified_risks.csv` preserves the raw discovered risk records.
+`risk_review_workpaper.csv` adds auditor-review fields: high or critical risks,
+low-confidence risks, and significant component risks are marked `Pending`; all
+other discovered risks are marked `Not Required`.
 
 ### Auditor feedback loop
 

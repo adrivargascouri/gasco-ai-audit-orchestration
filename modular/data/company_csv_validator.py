@@ -147,7 +147,10 @@ def load_company_group_structure(file_path: str | Path) -> pd.DataFrame:
         "revenue": "Revenue",
         "risk_level": "Risk_Level",
     })
-    return dataframe[["Entity", "Country", "Assets", "Revenue", "Risk_Level"]]
+    columns = ["Entity", "Country", "Assets", "Revenue", "Risk_Level"]
+    if "manual_risk_flag" in dataframe.columns:
+        columns.append("manual_risk_flag")
+    return dataframe[columns]
 
 
 def load_company_findings(file_path: str | Path) -> pd.DataFrame:
