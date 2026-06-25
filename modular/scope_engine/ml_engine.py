@@ -26,6 +26,7 @@ ESTIMATION_FEATURE_WEIGHTS = {
     "prior_findings_count": 1.0,
     "severe_findings_count": 1.0,
 }
+SEVERE_FINDING_LEVELS = {RiskLevel.HIGH.value, "Critical"}
 
 
 class MLScopeEngine(ScopeRecommendationEngine):
@@ -249,4 +250,4 @@ class MLScopeEngine(ScopeRecommendationEngine):
         if self.findings_df.empty:
             return 0
         entity_findings = self.findings_df[self.findings_df["Entity"] == entity]
-        return int((entity_findings["Severity"] == RiskLevel.HIGH.value).sum())
+        return int(entity_findings["Severity"].isin(SEVERE_FINDING_LEVELS).sum())

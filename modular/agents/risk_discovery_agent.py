@@ -17,6 +17,7 @@ RISK_COLUMNS = [
     "evidence_value",
     "confidence",
 ]
+SEVERE_FINDING_LEVELS = {"high", "critical"}
 
 
 class RiskDiscoveryAgent:
@@ -120,7 +121,11 @@ class RiskDiscoveryAgent:
 
         risks: list[dict[str, Any]] = []
         high_findings = findings[
-            findings["severity"].astype(str).str.strip().str.casefold() == "high"
+            findings["severity"]
+            .astype(str)
+            .str.strip()
+            .str.casefold()
+            .isin(SEVERE_FINDING_LEVELS)
         ]
 
         for _, row in high_findings.iterrows():

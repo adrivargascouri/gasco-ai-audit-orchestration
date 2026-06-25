@@ -120,7 +120,9 @@ row-specific messages that explain what needs to be corrected.
 
 ## Outputs
 
-Output directories have distinct status and should not be treated as equivalent:
+Output directories have distinct status and should not be treated as equivalent.
+`outputs_crewai/` is the official current output directory for the primary
+pipeline. The other output folders are retained only for comparison and history:
 
 | Directory | Status and meaning |
 | --- | --- |
@@ -146,9 +148,10 @@ The primary run generates these artifacts in `outputs_crewai/`:
 | `bdo_documentation_memo.txt` | Methodology-oriented scoping and coverage memo |
 | `component_auditor_instruction_pack.csv` | Component auditor instruction pack |
 | `human_review_ai_recommendations.csv` | AI recommendations and evidence prepared for auditor review |
-| `auditor_review_workpaper.csv` | Blank/pending auditor decision template |
-| `auditor_feedback.csv` | Structured auditor decision labels derived from the auditor review workpaper for future ML improvement |
-| `audit_trail.csv` | Initial audit-trail rows with pending final-decision fields |
+| `auditor_review_workpaper.csv` | Auditor input workpaper prepared with blank final-decision fields |
+| `final_approved_scope.csv` | Final scope output; blank auditor scopes default to the AI/guardrail recommendation with `final_decision_source=ai_default` |
+| `auditor_feedback.csv` | Structured auditor decision labels derived from final approval for future ML improvement |
+| `audit_trail.csv` | Audit trail updated with final decisions, override flags, and decision source |
 | `final_human_review_report.txt` | HITL status report and completion guidance |
 
 ### Risk discovery review outputs
@@ -164,16 +167,24 @@ other discovered risks are marked `Not Required`.
 
 ### Auditor feedback loop
 
-The official pipeline creates `auditor_feedback.csv` from
-`auditor_review_workpaper.csv` on every run. It stores each entity's AI
-recommended scope, final auditor scope, decision status, auditor comment,
-feedback label, feedback reason, and whether the row is usable for future
-training.
+The official pipeline prepares `auditor_review_workpaper.csv` for human auditor
+input. Auditors can complete `final_auditor_scope`, `decision_status`,
+`auditor_comment`, `approved_by`, and `approval_date` before finalizing scoping.
+
+The final approval step creates `final_approved_scope.csv` from the workpaper. If
+`final_auditor_scope` is blank, GASCO defaults to the AI/guardrail recommendation
+and marks `final_decision_source=ai_default`. If the auditor fills
+`final_auditor_scope`, the decision is marked as auditor-provided; accepted or
+overridden auditor decisions can be used as training feedback.
+
+The official pipeline also creates `auditor_feedback.csv` on every run. It stores
+each entity's AI recommended scope, final auditor scope, decision status, auditor
+comment, feedback label, feedback reason, and whether the row is usable for
+future training.
 
 This file does not retrain the local ML model yet. It prepares labeled human
 decisions so a future model-improvement or retraining workflow can distinguish
-accepted AI recommendations from auditor overrides while leaving pending
-decisions out of training data.
+accepted AI recommendations, auditor overrides, and AI-default decisions.
 
 The pipeline does not clear an output directory before running. A file present in
 `outputs_crewai/` but not listed above may be an artifact from another or older
@@ -185,8 +196,8 @@ its provenance.
 - CrewAI orchestration is deterministic and sequential.
 - `LocalCrewLLM` is a local stub/shim used to satisfy CrewAI orchestration; it does
   not perform generative reasoning or call an external LLM.
-- HITL currently generates review templates, pending audit-trail fields, and
-  auditor feedback labels, but it does not retrain the ML model.
+- HITL currently generates review templates, final approval defaults, audit-trail
+  updates, and auditor feedback labels, but it does not retrain the ML model.
 - Older rule-based, modular comparison, and standalone ML pipelines remain for
   historical comparison and may produce different output families.
 - Automated tests are not yet implemented.
