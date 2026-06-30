@@ -8,7 +8,7 @@ GASCO only suggests audit scoping decisions.
 The auditor makes the final decision.
 
 Human review policy
-Human review is required for low confidence, high risk, significant components, or guardrail adjustments.
+Human review is required for low confidence, high risk, significant components, guardrail adjustments, manual financial-risk flags, or multiple financial risks on one component.
 The hitl_review_reason field documents the stricter HITL policy and may differ from the legacy Requires_Human_Review guardrail flag.
 
 Current review status

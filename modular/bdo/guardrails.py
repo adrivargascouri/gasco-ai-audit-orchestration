@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import pandas as pd
 
+from modular.agents.risk_discovery_agent import FINANCIAL_GUARDRAIL_RISK_TYPES
 from modular.config.config_schema import BDOGuardrailsConfig
 
 
@@ -28,6 +29,7 @@ class BDOGuardrails:
         self,
         scoped_df: pd.DataFrame,
         feature_df: pd.DataFrame | None = None,
+        identified_risks: pd.DataFrame | None = None,
     ) -> tuple[pd.DataFrame, GuardrailCoverageStatus]:
         """Apply guardrails and return adjusted recommendations plus coverage."""
         adjusted_df = scoped_df.copy()
@@ -39,6 +41,11 @@ class BDOGuardrails:
         elif "Severe_Findings_Count" not in adjusted_df.columns:
             adjusted_df["Severe_Findings_Count"] = 0
 
+        adjusted_df = self._add_financial_risk_context(
+            adjusted_df,
+            identified_risks,
+        )
+
         adjusted_rows = [
             self._apply_row_guardrails(row)
             for _, row in adjusted_df.iterrows()
@@ -48,17 +55,87 @@ class BDOGuardrails:
         adjusted_df = self._flag_coverage_gap(adjusted_df, coverage_status)
         return adjusted_df, coverage_status
 
+    def _add_financial_risk_context(
+        self,
+        scoped_df: pd.DataFrame,
+        identified_risks: pd.DataFrame | None,
+    ) -> pd.DataFrame:
+        result = scoped_df.copy()
+        result["Financial_Risk_Types"] = ""
+        result["Financial_Risk_Count"] = 0
+        result["Financial_Risk_Guardrail_Applied"] = False
+        result["Financial_Risk_Human_Review_Required"] = False
+        result["Financial_Risk_Guardrail_Action"] = "None"
+        result["Financial_Risk_Guardrail_Reason"] = ""
+
+        if identified_risks is None or identified_risks.empty:
+            return result
+        required_columns = {"entity_name", "risk_type"}
+        if not required_columns.issubset(identified_risks.columns):
+            return result
+
+        risk_df = identified_risks.copy()
+        risk_df["_entity_key"] = self._entity_key(risk_df["entity_name"])
+        risk_df["_risk_type_key"] = risk_df["risk_type"].astype(str).str.strip().str.casefold()
+        canonical_by_key = {
+            risk_type.casefold(): risk_type for risk_type in FINANCIAL_GUARDRAIL_RISK_TYPES
+        }
+        risk_df["Financial_Risk_Type"] = risk_df["_risk_type_key"].map(canonical_by_key)
+        risk_df = risk_df.dropna(subset=["Financial_Risk_Type"])
+        if risk_df.empty:
+            return result
+
+        summaries = []
+        for entity_key, group in risk_df.groupby("_entity_key", dropna=True):
+            risk_types = [
+                risk_type
+                for risk_type in FINANCIAL_GUARDRAIL_RISK_TYPES
+                if risk_type in set(group["Financial_Risk_Type"])
+            ]
+            summaries.append({
+                "_entity_key": entity_key,
+                "Financial_Risk_Types": "; ".join(risk_types),
+                "Financial_Risk_Count": int(len(group)),
+            })
+
+        summary_df = pd.DataFrame(summaries)
+        result["_entity_key"] = self._entity_key(result["Entity"])
+        result = result.merge(summary_df, on="_entity_key", how="left", suffixes=("", "_risk"))
+        result["Financial_Risk_Types"] = result["Financial_Risk_Types_risk"].fillna(
+            result["Financial_Risk_Types"]
+        )
+        result["Financial_Risk_Count"] = (
+            pd.to_numeric(result["Financial_Risk_Count_risk"], errors="coerce")
+            .fillna(result["Financial_Risk_Count"])
+            .astype(int)
+        )
+        return result.drop(
+            columns=[
+                column
+                for column in [
+                    "_entity_key",
+                    "Financial_Risk_Types_risk",
+                    "Financial_Risk_Count_risk",
+                ]
+                if column in result
+            ]
+        )
+
     def _apply_row_guardrails(self, row: pd.Series) -> dict:
         original_scope = row["Recommended_Scope"]
         adjusted_scope = original_scope
         reasons: list[str] = []
+        financial_reasons: list[str] = []
         adjusted = False
         review = False
+        financial_scope_adjusted = False
 
         asset_percentage = float(row.get("Asset_Percentage", 0.0))
         risk_level = str(row.get("Risk_Level", ""))
         confidence = float(row.get("Prediction_Confidence", 0.0))
         severe_findings_count = int(row.get("Severe_Findings_Count", 0))
+        financial_risk_types = self._financial_risk_types(row)
+        financial_risk_count = int(row.get("Financial_Risk_Count", 0))
 
         if asset_percentage >= self.config.significant_component_threshold:
             if self._is_less_than(adjusted_scope, "Full Scope"):
@@ -90,16 +167,50 @@ class BDOGuardrails:
                     "Severe prior findings noted; planned work should address the finding history."
                 )
 
+        requires_specific_procedures = [
+            risk_type
+            for risk_type in ("Liquidity Risk", "High Debt Risk")
+            if risk_type in financial_risk_types
+        ]
+        if requires_specific_procedures:
+            risk_label = " and ".join(requires_specific_procedures)
+            if self._is_less_than(adjusted_scope, "Specific Procedures"):
+                adjusted_scope = "Specific Procedures"
+                adjusted = True
+                financial_scope_adjusted = True
+                financial_reasons.append(
+                    f"Financial risk guardrail: {risk_label} requires at least Specific Procedures."
+                )
+            else:
+                financial_reasons.append(
+                    f"Financial risk guardrail: {risk_label} requires at least Specific Procedures; current scope already meets the minimum."
+                )
+
+        if "Manual Risk Flag" in financial_risk_types:
+            review = True
+            financial_reasons.append(
+                "Financial risk guardrail: Manual Risk Flag requires human review."
+            )
+
+        if financial_risk_count > 1:
+            review = True
+            financial_reasons.append(
+                "Financial risk guardrail: multiple financial risks on the same component require human review."
+            )
+
         if confidence < self.config.confidence_threshold:
             review = True
             reasons.append(
                 f"ML confidence {confidence:.2f} is below the {self.config.confidence_threshold:.2f} threshold."
             )
 
+        if financial_reasons:
+            reasons.extend(financial_reasons)
+
         if not reasons:
             reasons.append("ML recommendation accepted; no guardrail adjustment required.")
 
-        action = self._action(adjusted, review)
+        action = self._action(adjusted, review, bool(financial_reasons))
         result = row.to_dict()
         result.update({
             "Original_ML_Scope": original_scope,
@@ -108,6 +219,19 @@ class BDOGuardrails:
             "Guardrail_Reason": " ".join(reasons),
             "Requires_Human_Review": bool(review),
             "Recommended_Scope": adjusted_scope,
+            "Financial_Risk_Guardrail_Applied": bool(financial_reasons),
+            "Financial_Risk_Human_Review_Required": bool(
+                "Manual Risk Flag" in financial_risk_types or financial_risk_count > 1
+            ),
+            "Financial_Risk_Guardrail_Action": self._financial_risk_action(
+                financial_scope_adjusted,
+                bool(
+                    "Manual Risk Flag" in financial_risk_types
+                    or financial_risk_count > 1
+                ),
+                bool(financial_reasons),
+            ),
+            "Financial_Risk_Guardrail_Reason": " ".join(financial_reasons),
         })
         return result
 
@@ -168,11 +292,38 @@ class BDOGuardrails:
             < self.config.scope_order.get(required_scope, 0)
         )
 
-    def _action(self, adjusted: bool, review: bool) -> str:
+    def _entity_key(self, values: pd.Series) -> pd.Series:
+        return values.astype(str).str.strip().str.casefold()
+
+    def _financial_risk_types(self, row: pd.Series) -> set[str]:
+        risk_types = str(row.get("Financial_Risk_Types", "")).strip()
+        if not risk_types:
+            return set()
+        return {risk_type.strip() for risk_type in risk_types.split(";") if risk_type.strip()}
+
+    def _financial_risk_action(
+        self,
+        adjusted: bool,
+        review: bool,
+        applied: bool,
+    ) -> str:
+        if not applied:
+            return "None"
+        if adjusted and review:
+            return "Scope adjusted and human review required"
+        if adjusted:
+            return "Scope adjusted"
+        if review:
+            return "Human review required"
+        return "Documented minimum-scope guardrail"
+
+    def _action(self, adjusted: bool, review: bool, triggered: bool = False) -> str:
         if adjusted and review:
             return "Adjusted and flagged for review"
         if adjusted:
             return "Adjusted"
         if review:
             return "Flagged for review"
+        if triggered:
+            return "Guardrail applied"
         return "Accepted"

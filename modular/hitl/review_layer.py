@@ -32,6 +32,8 @@ class HumanInTheLoopReviewLayer:
         "Confidence",
         "Evidence_Used",
         "Guardrails_Triggered",
+        "Financial_Risk_Guardrail",
+        "Financial_Risk_Types",
         "Human_Review_Required",
         "hitl_review_reason",
     ]
@@ -40,6 +42,9 @@ class HumanInTheLoopReviewLayer:
         "component_name",
         "ai_recommended_scope",
         "hitl_review_reason",
+        "financial_risk_guardrail",
+        "financial_risk_types",
+        "financial_risk_guardrail_reason",
         "final_auditor_scope",
         "decision_status",
         "auditor_comment",
@@ -56,6 +61,9 @@ class HumanInTheLoopReviewLayer:
         "timestamp",
         "reason_for_change",
         "guardrails_triggered",
+        "financial_risk_guardrail",
+        "financial_risk_types",
+        "financial_risk_guardrail_reason",
         "human_review_required",
         "hitl_review_reason",
     ]
@@ -84,6 +92,11 @@ class HumanInTheLoopReviewLayer:
             hitl_review_reason = self._hitl_review_reason(row)
             reasoning = self._reasoning(row, explanations.get(component_name, ""))
             evidence_used = self._evidence_used(row)
+            financial_risk_guardrail = self._financial_risk_guardrail(row)
+            financial_risk_types = str(row.get("Financial_Risk_Types", "")).strip()
+            financial_risk_reason = str(
+                row.get("Financial_Risk_Guardrail_Reason", "")
+            ).strip()
             decision_status = "pending"
 
             ai_review_rows.append({
@@ -93,6 +106,8 @@ class HumanInTheLoopReviewLayer:
                 "Confidence": row.get("Prediction_Confidence", ""),
                 "Evidence_Used": evidence_used,
                 "Guardrails_Triggered": guardrails_triggered,
+                "Financial_Risk_Guardrail": financial_risk_guardrail,
+                "Financial_Risk_Types": financial_risk_types,
                 "Human_Review_Required": human_review_required,
                 "hitl_review_reason": hitl_review_reason,
             })
@@ -101,6 +116,9 @@ class HumanInTheLoopReviewLayer:
                 "component_name": component_name,
                 "ai_recommended_scope": adjusted_scope,
                 "hitl_review_reason": hitl_review_reason,
+                "financial_risk_guardrail": financial_risk_guardrail,
+                "financial_risk_types": financial_risk_types,
+                "financial_risk_guardrail_reason": financial_risk_reason,
                 "final_auditor_scope": "",
                 "decision_status": decision_status,
                 "auditor_comment": "",
@@ -117,6 +135,9 @@ class HumanInTheLoopReviewLayer:
                 "timestamp": timestamp,
                 "reason_for_change": self._reason_for_change(row),
                 "guardrails_triggered": guardrails_triggered,
+                "financial_risk_guardrail": financial_risk_guardrail,
+                "financial_risk_types": financial_risk_types,
+                "financial_risk_guardrail_reason": financial_risk_reason,
                 "human_review_required": human_review_required,
                 "hitl_review_reason": hitl_review_reason,
             })
@@ -174,6 +195,8 @@ class HumanInTheLoopReviewLayer:
             f"Risk_Level={row.get('Risk_Level')}",
             f"Severe_Findings_Count={row.get('Severe_Findings_Count', 0)}",
             f"Prediction_Confidence={row.get('Prediction_Confidence')}",
+            f"Financial_Risk_Types={row.get('Financial_Risk_Types', '')}",
+            f"Financial_Risk_Count={row.get('Financial_Risk_Count', 0)}",
         ]
         basis = row.get("Basis_For_Selection", "")
         if basis:
@@ -207,9 +230,16 @@ class HumanInTheLoopReviewLayer:
             triggers.append("Significant component")
         if guardrail_adjusted:
             triggers.append("Guardrail adjusted AI recommendation")
+        if bool(row.get("Financial_Risk_Human_Review_Required", False)):
+            triggers.append("Financial risk guardrail")
         if bool(row.get("Requires_Human_Review", False)) and not triggers:
             triggers.append("Legacy guardrail review flag")
         return triggers
+
+    def _financial_risk_guardrail(self, row: pd.Series) -> str:
+        if bool(row.get("Financial_Risk_Guardrail_Applied", False)):
+            return str(row.get("Financial_Risk_Guardrail_Action", "Applied")).strip()
+        return "None"
 
     def _hitl_review_reason(self, row: pd.Series) -> str:
         triggers = self._review_triggers(row)
@@ -255,7 +285,7 @@ class HumanInTheLoopReviewLayer:
             "The auditor makes the final decision.",
             "",
             "Human review policy",
-            "Human review is required for low confidence, high risk, significant components, or guardrail adjustments.",
+            "Human review is required for low confidence, high risk, significant components, guardrail adjustments, manual financial-risk flags, or multiple financial risks on one component.",
             "The hitl_review_reason field documents the stricter HITL policy and may differ from the legacy Requires_Human_Review guardrail flag.",
             "",
             "Current review status",

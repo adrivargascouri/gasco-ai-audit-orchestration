@@ -22,6 +22,11 @@ class BDODocumentationMemo:
         review_df = scoped_df[scoped_df["Requires_Human_Review"] == True]
         distribution = scoped_df["Guardrail_Adjusted_Scope"].value_counts().to_dict()
         ml_distribution = scoped_df["Original_ML_Scope"].value_counts().to_dict()
+        financial_guardrail_count = (
+            int(scoped_df["Financial_Risk_Guardrail_Applied"].sum())
+            if "Financial_Risk_Guardrail_Applied" in scoped_df.columns
+            else 0
+        )
 
         lines = [
             "GASCO BDO-Style Scoping Documentation Memo",
@@ -34,6 +39,7 @@ class BDODocumentationMemo:
             "",
             "Guardrail adjustments",
             f"Guardrail-adjusted distribution: {distribution}. Adjusted recommendations: {adjusted_count}.",
+            f"Financial-risk guardrail triggers documented: {financial_guardrail_count}.",
         ]
 
         for _, row in scoped_df.iterrows():

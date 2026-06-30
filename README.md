@@ -10,14 +10,16 @@ auditor decision-support system: its recommendations are not final audit decisio
 The current primary execution path is `src/main_crewai.py`. It runs the following
 stages sequentially:
 
-1. Load configuration, group entity data, findings, ML reference data, and the
-   persisted scope model.
-2. Generate local ML scope predictions and explanations.
-3. Apply the existing methodology guardrails and identify recommendations that
-   require human review.
-4. Calculate group coverage and identify risky uncovered entities.
-5. Generate group audit instructions and supporting documentation.
-6. Export CrewAI workflow, explainability, guardrail, and HITL review artifacts to
+1. Load configuration, group entity data, findings, optional financial data, ML
+   reference data, and the persisted scope model.
+2. Run deterministic risk discovery over the loaded official input set.
+3. Generate local ML scope predictions and explanations.
+4. Apply methodology guardrails, including deterministic financial-risk
+   guardrails derived from RiskDiscoveryAgent output, and identify
+   recommendations that require human review.
+5. Calculate group coverage and identify risky uncovered entities.
+6. Generate group audit instructions and supporting documentation.
+7. Export CrewAI workflow, explainability, guardrail, and HITL review artifacts to
    `outputs_crewai/`.
 
 The CrewAI agents coordinate these deterministic local stages. They do not call an
@@ -136,34 +138,52 @@ The primary run generates these artifacts in `outputs_crewai/`:
 
 | Artifact | Meaning |
 | --- | --- |
-| `significance_scope_recommendation.csv` | ML recommendations, guardrail adjustments, review flags, and methodology fields by component |
+| `significance_scope_recommendation.csv` | ML recommendations, guardrail adjustments, financial-risk guardrail fields, review flags, and methodology fields by component |
 | `coverage_summary.csv` | Group asset coverage result for included scopes |
 | `group_audit_instructions.csv` | Component-level audit instructions based on adjusted scope |
 | `risky_uncovered_entities.csv` | Risky components outside the scopes included in coverage |
 | `feature_importance.csv` | Feature importance from the persisted classifier |
 | `identified_risks.csv` | Deterministic risks discovered from the same group, findings, and optional financial data used by the official run |
-| `risk_review_workpaper.csv` | Auditor review workpaper for discovered risks, with pending status for high-severity, low-confidence, or significant-component risks |
+| `risk_review_workpaper.csv` | Auditor review workpaper for discovered risks, with pending status for high-severity, low-confidence, significant-component, manual-flag, or multiple-financial-risk items |
 | `prediction_explanations.txt` | Selected human-readable ML prediction explanations |
 | `crew_workflow_summary.txt` | Deterministic CrewAI stage summary |
 | `bdo_documentation_memo.txt` | Methodology-oriented scoping and coverage memo |
 | `component_auditor_instruction_pack.csv` | Component auditor instruction pack |
-| `human_review_ai_recommendations.csv` | AI recommendations and evidence prepared for auditor review |
-| `auditor_review_workpaper.csv` | Auditor input workpaper prepared with blank final-decision fields |
-| `final_approved_scope.csv` | Final scope output; blank auditor scopes default to the AI/guardrail recommendation with `final_decision_source=ai_default` |
-| `auditor_feedback.csv` | Structured auditor decision labels derived from final approval for future ML improvement |
-| `audit_trail.csv` | Audit trail updated with final decisions, override flags, and decision source |
+| `human_review_ai_recommendations.csv` | AI recommendations, evidence, and financial-risk guardrail fields prepared for auditor review |
+| `auditor_review_workpaper.csv` | Auditor input workpaper prepared with blank final-decision fields and financial-risk guardrail context |
+| `final_approved_scope.csv` | Final scope output; blank auditor scopes default to the AI/guardrail recommendation with `final_decision_source=ai_default`; financial-risk guardrail context is carried forward |
+| `auditor_feedback.csv` | Structured auditor decision labels and financial-risk guardrail context derived from final approval for future ML improvement |
+| `audit_trail.csv` | Audit trail updated with final decisions, override flags, decision source, and financial-risk guardrail context |
 | `final_human_review_report.txt` | HITL status report and completion guidance |
 
 ### Risk discovery review outputs
 
-The official pipeline also runs the existing deterministic Risk Discovery Agent
-after the CrewAI workflow has completed. When `--financial-file` is provided,
+The official pipeline runs the existing deterministic Risk Discovery Agent before
+the ML prediction stage is kicked off. When `--financial-file` is provided,
 validated financial indicators are aligned to group entities and can produce
 liquidity, debt, significant-component, and manual-flag risks.
 `identified_risks.csv` preserves the raw discovered risk records.
 `risk_review_workpaper.csv` adds auditor-review fields: high or critical risks,
-low-confidence risks, and significant component risks are marked `Pending`; all
-other discovered risks are marked `Not Required`.
+low-confidence risks, significant-component risks, manual risk flags, and
+multiple financial risks on the same component are marked `Pending`; all other
+discovered risks are marked `Not Required`.
+
+### Financial-risk guardrails
+
+After ML prediction, GASCO applies a deterministic financial-risk guardrail layer
+using RiskDiscoveryAgent output. This step does not retrain the model and does
+not change ML prediction logic; it only adjusts or flags the post-ML
+recommendation before coverage, instructions, HITL review, final approval, and
+feedback artifacts are generated.
+
+The financial-risk rules are:
+
+- Manual Risk Flag requires human review.
+- Liquidity Risk requires at least `Specific Procedures`.
+- High Debt Risk requires at least `Specific Procedures`.
+- More than one financial risk on the same component requires human review.
+- Every financial-risk guardrail trigger is written to the scope file, HITL
+  workpapers, audit trail, final approval, and auditor feedback outputs.
 
 ### Auditor feedback loop
 
@@ -179,8 +199,8 @@ overridden auditor decisions can be used as training feedback.
 
 The official pipeline also creates `auditor_feedback.csv` on every run. It stores
 each entity's AI recommended scope, final auditor scope, decision status, auditor
-comment, feedback label, feedback reason, and whether the row is usable for
-future training.
+comment, feedback label, feedback reason, financial-risk guardrail context, and
+whether the row is usable for future training.
 
 This file does not retrain the local ML model yet. It prepares labeled human
 decisions so a future model-improvement or retraining workflow can distinguish

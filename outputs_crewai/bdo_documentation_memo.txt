@@ -8,22 +8,23 @@ The model produced recommendations for 3 components. Original ML distribution: {
 
 Guardrail adjustments
 Guardrail-adjusted distribution: {'Full Scope': 3}. Adjusted recommendations: 2.
-- Northwind Germany GmbH: Full Scope -> Full Scope (ML confidence 0.49 is below the 0.65 threshold.)
-- Northwind Brazil Ltda: Specific Procedures -> Full Scope (Significant component threshold met; scope increased to Full Scope for partner review. Severe prior findings noted; planned work should address the finding history. ML confidence 0.60 is below the 0.65 threshold.)
-- Northwind Canada Inc: Specific Procedures -> Full Scope (Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.56 is below the 0.65 threshold.)
+Financial-risk guardrail triggers documented: 3.
+- Northwind Germany GmbH: Full Scope -> Full Scope (ML confidence 0.49 is below the 0.65 threshold. Financial risk guardrail: Liquidity Risk and High Debt Risk requires at least Specific Procedures; current scope already meets the minimum. Financial risk guardrail: multiple financial risks on the same component require human review.)
+- Northwind Brazil Ltda: Specific Procedures -> Full Scope (Significant component threshold met; scope increased to Full Scope for partner review. Severe prior findings noted; planned work should address the finding history. ML confidence 0.60 is below the 0.65 threshold. Financial risk guardrail: Liquidity Risk and High Debt Risk requires at least Specific Procedures; current scope already meets the minimum. Financial risk guardrail: multiple financial risks on the same component require human review.)
+- Northwind Canada Inc: Specific Procedures -> Full Scope (Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.56 is below the 0.65 threshold. Financial risk guardrail: Manual Risk Flag requires human review.)
 
 Basis for component selection
-- Northwind Germany GmbH: Materiality | selected for work: Yes.
-- Northwind Brazil Ltda: Materiality / Risk / Prior findings | selected for work: Yes.
-- Northwind Canada Inc: Materiality | selected for work: Yes.
+- Northwind Germany GmbH: Materiality / Financial risk | selected for work: Yes.
+- Northwind Brazil Ltda: Materiality / Risk / Prior findings / Financial risk | selected for work: Yes.
+- Northwind Canada Inc: Materiality / Financial risk | selected for work: Yes.
 
 Coverage result
 Adjusted coverage is 100.00% (240000000 of 240000000 assets). Status: Sufficient audit coverage.
 
 Components requiring human review
-- Northwind Germany GmbH: ML confidence 0.49 is below the 0.65 threshold.
-- Northwind Brazil Ltda: Significant component threshold met; scope increased to Full Scope for partner review. Severe prior findings noted; planned work should address the finding history. ML confidence 0.60 is below the 0.65 threshold.
-- Northwind Canada Inc: Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.56 is below the 0.65 threshold.
+- Northwind Germany GmbH: ML confidence 0.49 is below the 0.65 threshold. Financial risk guardrail: Liquidity Risk and High Debt Risk requires at least Specific Procedures; current scope already meets the minimum. Financial risk guardrail: multiple financial risks on the same component require human review.
+- Northwind Brazil Ltda: Significant component threshold met; scope increased to Full Scope for partner review. Severe prior findings noted; planned work should address the finding history. ML confidence 0.60 is below the 0.65 threshold. Financial risk guardrail: Liquidity Risk and High Debt Risk requires at least Specific Procedures; current scope already meets the minimum. Financial risk guardrail: multiple financial risks on the same component require human review.
+- Northwind Canada Inc: Significant component threshold met; scope increased to Full Scope for partner review. ML confidence 0.56 is below the 0.65 threshold. Financial risk guardrail: Manual Risk Flag requires human review.
 
 Professional judgment reminder
 The ML model is an assistive input. Final scoping decisions require engagement team evaluation, partner oversight where relevant, and documentation of professional judgment.

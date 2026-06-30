@@ -1,4 +1,4 @@
-component_name,ai_recommended_scope,final_auditor_scope,auditor_override,final_decision_source
-Northwind Germany GmbH,Full Scope,Full Scope,False,ai_default
-Northwind Brazil Ltda,Full Scope,Full Scope,False,ai_default
-Northwind Canada Inc,Full Scope,Full Scope,False,ai_default
+component_name,ai_recommended_scope,final_auditor_scope,auditor_override,final_decision_source,hitl_review_reason,financial_risk_guardrail,financial_risk_types,financial_risk_guardrail_reason
+Northwind Germany GmbH,Full Scope,Full Scope,False,ai_default,Multiple review triggers: Low ML confidence; Significant component; Financial risk guardrail,Human review required,Liquidity Risk; High Debt Risk,Financial risk guardrail: Liquidity Risk and High Debt Risk requires at least Specific Procedures; current scope already meets the minimum. Financial risk guardrail: multiple financial risks on the same component require human review.
+Northwind Brazil Ltda,Full Scope,Full Scope,False,ai_default,Multiple review triggers: Low ML confidence; High risk component; Significant component; Guardrail adjusted AI recommendation; Financial risk guardrail,Human review required,Liquidity Risk; High Debt Risk,Financial risk guardrail: Liquidity Risk and High Debt Risk requires at least Specific Procedures; current scope already meets the minimum. Financial risk guardrail: multiple financial risks on the same component require human review.
+Northwind Canada Inc,Full Scope,Full Scope,False,ai_default,Multiple review triggers: Low ML confidence; Significant component; Guardrail adjusted AI recommendation; Financial risk guardrail,Human review required,Manual Risk Flag,Financial risk guardrail: Manual Risk Flag requires human review.

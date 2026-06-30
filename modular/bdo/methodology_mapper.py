@@ -58,6 +58,8 @@ class BDOMethodologyMapper:
             bases.append("Risk")
         if severe_findings > 0:
             bases.append("Prior findings")
+        if bool(row.get("Financial_Risk_Guardrail_Applied", False)):
+            bases.append("Financial risk")
         if "coverage" in reason.lower():
             bases.append("Coverage")
         if not bases:

@@ -40,6 +40,15 @@ class InstructionAgent:
                 "Guardrail_Adjusted_Scope": scope,
                 "Guardrail_Action": row.get("Guardrail_Action", "Accepted"),
                 "Guardrail_Reason": row.get("Guardrail_Reason", ""),
+                "Financial_Risk_Types": row.get("Financial_Risk_Types", ""),
+                "Financial_Risk_Guardrail_Action": row.get(
+                    "Financial_Risk_Guardrail_Action",
+                    "None",
+                ),
+                "Financial_Risk_Guardrail_Reason": row.get(
+                    "Financial_Risk_Guardrail_Reason",
+                    "",
+                ),
                 "Requires_Human_Review": row.get("Requires_Human_Review", False),
                 "Recommended_Scope": scope,
                 "Prediction_Confidence": row["Prediction_Confidence"],

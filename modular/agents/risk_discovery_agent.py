@@ -18,6 +18,11 @@ RISK_COLUMNS = [
     "confidence",
 ]
 SEVERE_FINDING_LEVELS = {"high", "critical"}
+FINANCIAL_GUARDRAIL_RISK_TYPES = (
+    "Manual Risk Flag",
+    "Liquidity Risk",
+    "High Debt Risk",
+)
 
 
 class RiskDiscoveryAgent:
@@ -210,6 +215,178 @@ class RiskDiscoveryAgent:
 def discover_risks(client_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Discover potential audit risks from validated client intake data."""
     return RiskDiscoveryAgent().discover(client_data)
+
+
+def build_official_risk_discovery_input(
+    group_df: pd.DataFrame,
+    findings_df: pd.DataFrame,
+    financial_file: Path | None = None,
+) -> tuple[dict[str, pd.DataFrame], dict[str, object]]:
+    """Adapt official pipeline dataframes to the risk discovery agent input shape."""
+    financial_data, financial_status = _aligned_financial_data(
+        group_df,
+        financial_file,
+    )
+
+    findings = pd.DataFrame({
+        "entity_name": findings_df.get("Entity", pd.Series(dtype=object)),
+        "finding_description": findings_df.get("Finding", pd.Series(dtype=object)),
+        "severity": findings_df.get("Severity", pd.Series(dtype=object)),
+    })
+
+    group_entities = pd.DataFrame({
+        "entity_name": group_df.get("Entity", pd.Series(dtype=object)),
+        "manual_risk_flag": group_df.get(
+            "manual_risk_flag",
+            pd.Series(pd.NA, index=group_df.index),
+        ),
+    })
+    if "manual_risk_flag" in financial_data.columns:
+        financial_flags = (
+            financial_data[["entity_name", "manual_risk_flag"]]
+            .dropna(subset=["manual_risk_flag"])
+            .drop_duplicates(subset=["entity_name"])
+        )
+        group_entities = group_entities.merge(
+            financial_flags,
+            on="entity_name",
+            how="left",
+            suffixes=("", "_financial"),
+        )
+        group_entities["manual_risk_flag"] = group_entities[
+            "manual_risk_flag_financial"
+        ].combine_first(group_entities["manual_risk_flag"])
+        group_entities = group_entities.drop(columns=["manual_risk_flag_financial"])
+
+    return (
+        {
+            "financial_data": financial_data,
+            "findings": findings,
+            "group_entities": group_entities,
+        },
+        financial_status,
+    )
+
+
+def _clean_csv_dataframe(path: Path) -> pd.DataFrame:
+    """Load a validated CSV and strip whitespace from labels and text cells."""
+    dataframe = pd.read_csv(path, encoding="utf-8-sig")
+    dataframe.columns = dataframe.columns.astype(str).str.strip()
+    string_columns = dataframe.select_dtypes(include=["object", "string"]).columns
+    for column in string_columns:
+        dataframe[column] = dataframe[column].map(
+            lambda value: value.strip() if isinstance(value, str) else value
+        )
+    return dataframe
+
+
+def _entity_key(values: pd.Series) -> pd.Series:
+    """Normalize entity labels for component-name alignment."""
+    return values.astype(str).str.strip().str.casefold()
+
+
+def _base_financial_data(group_df: pd.DataFrame) -> pd.DataFrame:
+    """Build the group-derived financial frame used when no financial CSV is used."""
+    total_assets = pd.to_numeric(
+        group_df.get("Assets", pd.Series(dtype=float)),
+        errors="coerce",
+    )
+    financial_data = pd.DataFrame({
+        "entity_name": group_df.get("Entity", pd.Series(dtype=object)),
+        "total_assets": total_assets,
+    })
+    total_group_assets = total_assets.sum()
+    financial_data["asset_percentage"] = (
+        total_assets / total_group_assets if total_group_assets > 0 else pd.NA
+    )
+    return financial_data
+
+
+def _aligned_financial_data(
+    group_df: pd.DataFrame,
+    financial_file: Path | None,
+) -> tuple[pd.DataFrame, dict[str, object]]:
+    """Align optional financial intake rows to official group entities."""
+    base_financial_data = _base_financial_data(group_df)
+    if financial_file is None:
+        return base_financial_data, {
+            "provided": False,
+            "used": False,
+            "message": (
+                "Financial data: no --financial-file provided; risk discovery "
+                "used group assets only."
+            ),
+        }
+
+    financial_df = _clean_csv_dataframe(financial_file)
+    financial_df["_entity_key"] = _entity_key(financial_df["entity_name"])
+
+    aligned = base_financial_data.copy()
+    aligned["_entity_key"] = _entity_key(aligned["entity_name"])
+    aligned = aligned.merge(
+        financial_df,
+        on="_entity_key",
+        how="left",
+        suffixes=("", "_financial"),
+    )
+
+    matched_mask = aligned.get("entity_name_financial", pd.Series(dtype=object)).notna()
+    matched_rows = int(matched_mask.sum())
+    matched_entities = int(aligned.loc[matched_mask, "_entity_key"].nunique())
+    group_keys = set(aligned["_entity_key"].dropna())
+    ignored_rows = int((~financial_df["_entity_key"].isin(group_keys)).sum())
+
+    if matched_rows == 0:
+        return base_financial_data, {
+            "provided": True,
+            "used": False,
+            "path": financial_file,
+            "matched_rows": 0,
+            "matched_entities": 0,
+            "ignored_rows": ignored_rows,
+            "message": (
+                f"Financial data: provided at {financial_file}, but no entity "
+                "names matched the loaded group structure; risk discovery used "
+                "group assets only."
+            ),
+        }
+
+    aligned["total_assets"] = pd.to_numeric(
+        aligned.get("total_assets_financial", aligned["total_assets"]),
+        errors="coerce",
+    ).fillna(pd.to_numeric(aligned["total_assets"], errors="coerce"))
+    total_group_assets = pd.to_numeric(
+        base_financial_data["total_assets"],
+        errors="coerce",
+    ).sum()
+    aligned["asset_percentage"] = (
+        aligned["total_assets"] / total_group_assets if total_group_assets > 0 else pd.NA
+    )
+
+    drop_columns = [
+        "_entity_key",
+        "entity_name_financial",
+        "total_assets_financial",
+    ]
+    aligned = aligned.drop(
+        columns=[column for column in drop_columns if column in aligned]
+    )
+
+    missing_group_entities = int(len(group_df) - matched_entities)
+    return aligned, {
+        "provided": True,
+        "used": True,
+        "path": financial_file,
+        "matched_rows": matched_rows,
+        "matched_entities": matched_entities,
+        "ignored_rows": ignored_rows,
+        "missing_group_entities": missing_group_entities,
+        "message": (
+            f"Financial data: provided and used from {financial_file}; "
+            f"matched {matched_rows} financial row(s) across "
+            f"{matched_entities} group entity/entities."
+        ),
+    }
 
 
 if __name__ == "__main__":

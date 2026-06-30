@@ -19,6 +19,10 @@ FINAL_APPROVED_SCOPE_COLUMNS = [
     "final_auditor_scope",
     "auditor_override",
     "final_decision_source",
+    "hitl_review_reason",
+    "financial_risk_guardrail",
+    "financial_risk_types",
+    "financial_risk_guardrail_reason",
 ]
 REQUIRED_WORKPAPER_COLUMNS = [
     "component_name",
@@ -83,6 +87,14 @@ def build_final_approved_scope(workpaper_df: pd.DataFrame) -> pd.DataFrame:
             "auditor_override": final_scope != ai_scope,
             "final_decision_source": (
                 "auditor" if final_scope_was_filled else "ai_default"
+            ),
+            "hitl_review_reason": _clean(row.get("hitl_review_reason", "")),
+            "financial_risk_guardrail": _clean(
+                row.get("financial_risk_guardrail", "")
+            ),
+            "financial_risk_types": _clean(row.get("financial_risk_types", "")),
+            "financial_risk_guardrail_reason": _clean(
+                row.get("financial_risk_guardrail_reason", "")
             ),
         })
 

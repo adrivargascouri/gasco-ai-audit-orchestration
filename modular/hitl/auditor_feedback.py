@@ -15,6 +15,10 @@ FEEDBACK_COLUMNS = [
     "feedback_label",
     "feedback_reason",
     "usable_for_training",
+    "hitl_review_reason",
+    "financial_risk_guardrail",
+    "financial_risk_types",
+    "financial_risk_guardrail_reason",
 ]
 
 
@@ -66,6 +70,14 @@ def build_auditor_feedback(auditor_review_df: pd.DataFrame) -> pd.DataFrame:
             "feedback_label": feedback_label,
             "feedback_reason": feedback_reason,
             "usable_for_training": usable_for_training,
+            "hitl_review_reason": _clean(row.get("hitl_review_reason", "")),
+            "financial_risk_guardrail": _clean(
+                row.get("financial_risk_guardrail", "")
+            ),
+            "financial_risk_types": _clean(row.get("financial_risk_types", "")),
+            "financial_risk_guardrail_reason": _clean(
+                row.get("financial_risk_guardrail_reason", "")
+            ),
         })
 
     return pd.DataFrame(feedback_rows, columns=FEEDBACK_COLUMNS)
@@ -135,6 +147,14 @@ def build_auditor_feedback_from_final_approval(
             "feedback_label": feedback_label,
             "feedback_reason": feedback_reason,
             "usable_for_training": usable_for_training,
+            "hitl_review_reason": _clean(row.get("hitl_review_reason", "")),
+            "financial_risk_guardrail": _clean(
+                row.get("financial_risk_guardrail", "")
+            ),
+            "financial_risk_types": _clean(row.get("financial_risk_types", "")),
+            "financial_risk_guardrail_reason": _clean(
+                row.get("financial_risk_guardrail_reason", "")
+            ),
         })
 
     return pd.DataFrame(feedback_rows, columns=FEEDBACK_COLUMNS)

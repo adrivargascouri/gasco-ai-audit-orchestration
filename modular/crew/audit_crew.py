@@ -19,6 +19,11 @@ from crewai.llms.base_llm import BaseLLM
 
 from modular.agents.coverage_agent import CoverageAgent, CoverageResult
 from modular.agents.instruction_agent import InstructionAgent, InstructionResult
+from modular.agents.risk_discovery_agent import (
+    RISK_COLUMNS,
+    build_official_risk_discovery_input,
+    discover_risks,
+)
 from modular.agents.risk_prediction_agent import RiskPredictionAgent, RiskPredictionResult
 from modular.bdo.component_instruction_pack import ComponentInstructionPack
 from modular.bdo.documentation_memo import BDODocumentationMemo
@@ -89,6 +94,12 @@ class GASCOAuditCrew:
 
         self.group_df: pd.DataFrame | None = None
         self.findings_df: pd.DataFrame | None = None
+        self.identified_risks: pd.DataFrame = pd.DataFrame(columns=RISK_COLUMNS)
+        self.financial_status: dict[str, Any] = {
+            "provided": False,
+            "used": False,
+            "message": "Financial data: risk discovery has not run.",
+        }
         self.risk_result: RiskPredictionResult | None = None
         self.guardrail_coverage_status: GuardrailCoverageStatus | None = None
         self.human_review_artifacts: HumanReviewArtifacts | None = None
@@ -98,12 +109,13 @@ class GASCOAuditCrew:
 
         self.crew = self._build_crew()
 
-    def run(self) -> dict[str, Any]:
+    def run(self, financial_file: Path | None = None) -> dict[str, Any]:
         """Run the CrewAI-orchestrated ML audit workflow."""
         self.group_df, self.findings_df = self.data_loader.load_group_data(
             self.config.group_data_path,
             self.config.findings_data_path,
         )
+        self._run_risk_discovery_stage(financial_file)
 
         self.crew_output = self.crew.kickoff(inputs={})
         export_paths = self._export_outputs()
@@ -115,7 +127,20 @@ class GASCOAuditCrew:
             "instruction_result": self.instruction_result,
             "export_paths": export_paths,
             "agent_outputs": self._agent_output_summary(),
+            "identified_risks": self.identified_risks,
+            "financial_status": self.financial_status,
         }
+
+    def _run_risk_discovery_stage(self, financial_file: Path | None) -> None:
+        if self.group_df is None or self.findings_df is None:
+            raise RuntimeError("Risk discovery requires loaded group and findings data")
+        client_data, financial_status = build_official_risk_discovery_input(
+            self.group_df,
+            self.findings_df,
+            financial_file=financial_file,
+        )
+        self.identified_risks = discover_risks(client_data)
+        self.financial_status = financial_status
 
     def _build_crew(self) -> Crew:
         llm = LocalCrewLLM()
@@ -186,6 +211,7 @@ class GASCOAuditCrew:
         guarded_df, guardrail_coverage_status = self.bdo_guardrails.apply(
             self.risk_result.scoped_df,
             self.risk_result.feature_df,
+            self.identified_risks,
         )
         self.guardrail_coverage_status = guardrail_coverage_status
         self.risk_result.scoped_df = self.bdo_methodology_mapper.map_outputs(guarded_df)
@@ -302,6 +328,7 @@ class GASCOAuditCrew:
             "CrewAI execution: sequential crew completed with local deterministic LLM callbacks.",
             "Prediction engine: MLScopeEngine using models/scope_model.pkl.",
             "Methodology guardrails: BDO-style post-ML validation applied before final exports.",
+            "Financial-risk guardrails: deterministic RiskDiscoveryAgent outputs applied after ML prediction without retraining the model.",
             "Human-in-the-loop review: auditor workpaper and audit trail generated before final scoping approval.",
         ])
 
@@ -314,7 +341,11 @@ class GASCOAuditCrew:
                 != self.risk_result.scoped_df["Guardrail_Adjusted_Scope"]
             ).sum()
         )
+        financial_guardrail_count = int(
+            self.risk_result.scoped_df["Financial_Risk_Guardrail_Applied"].sum()
+        )
         return (
             f"BDO Guardrails: {adjusted_count} recommendations adjusted; "
-            f"{review_count} components require human review."
+            f"{review_count} components require human review; "
+            f"{financial_guardrail_count} financial-risk guardrail trigger(s) documented."
         )

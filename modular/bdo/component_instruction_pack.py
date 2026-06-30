@@ -20,6 +20,9 @@ class ComponentInstructionPack:
         "Component_Auditor_Involvement",
         "Basis_For_Selection",
         "Guardrail_Reason",
+        "Financial_Risk_Types",
+        "Financial_Risk_Guardrail_Action",
+        "Financial_Risk_Guardrail_Reason",
         "Requires_Human_Review",
         "Expected_Component_Auditor_Communication",
     ]
