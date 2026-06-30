@@ -72,6 +72,20 @@ python src/main_ml.py
 
 These are not the official production path.
 
+## Testing
+
+Run the automated regression suite from the repository root:
+
+```powershell
+python -m pytest
+```
+
+The tests cover company CSV validation, deterministic risk discovery,
+financial-risk guardrails, HITL final approval, and an official pipeline smoke
+run using the company template files. The smoke test runs in a temporary copied
+project tree so it does not overwrite the repository's current `outputs_crewai/`
+artifacts.
+
 ## Inputs
 
 The primary pipeline uses these repository files:
@@ -220,4 +234,5 @@ its provenance.
   updates, and auditor feedback labels, but it does not retrain the ML model.
 - Older rule-based, modular comparison, and standalone ML pipelines remain for
   historical comparison and may produce different output families.
-- Automated tests are not yet implemented.
+- Automated tests currently focus on the official CrewAI MVP path and selected
+  deterministic modules.
